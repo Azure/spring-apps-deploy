@@ -1,0 +1,39 @@
+{
+  "name": "spring-cloud-deploy",
+  "version": "1.0.0",
+  "description": "spring-cloud-deploy",
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RuoyuWang-MS/spring-cloud-deploy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RuoyuWang-MS/spring-cloud-deploy/issues"
+  },
+  "homepage": "https://github.com/RuoyuWang-MS/spring-cloud-deploy#readme",
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.11.6",
+    "jest": "^27.3.1",
+    "ts-jest": "^27.0.7",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.0",
+    "@azure/arm-appplatform": "^1.4.0",
+    "@azure/identity": "^2.0.0",
+    "@azure/storage-file-share": "^12.8.0",
+    "azure-actions-utility": "^1.0.3",
+    "tar": "^6.1.11",
+    "uuid": "^8.3.2"
+  }
+}

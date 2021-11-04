@@ -1,0 +1,53 @@
+# azure spirng cloud action
+name: 'AzureSpringCloud'
+description: 'Deploy applications to Azure Spring Cloud and manage deployments.'
+inputs: 
+  azure-subscription:
+    description: 'Select the Azure Resource Manager subscription for the deployment.'
+    required: true
+  action:
+    description: 'Action to be performed on Azure Spring Cloud.'
+    required: true
+    default: 'Deploy'
+  service-name:
+    description: 'Select the Azure Spring Cloud service to which to deploy.'
+    required: true
+  app-name:
+    description: 'Select the Azure Spring Cloud app to deploy.'
+    required: true
+  use-staging-deployment:
+    description: "Automatically select the deployment that's set as Staging at the time the task runs."
+    required: true
+    default: true
+  create-new-deployment:
+    description: "Whether to target the deployment that's set as Staging at the time of execution. If unchecked, the 'Deployment Name' setting must be set."
+    required: false
+    default: false
+  deployment-name:
+    description: 'The deployment to which this task will apply. Lowercase letters, - and numbers only; must start with a letter.'
+    required: false
+  package:
+    description: "File path to the package or a folder containing the Spring Cloud app contents."
+    required: false
+    default: '${{ github.workspace }}/**/*.jar'
+  environment-variables:
+    description: "Edit the app's environment variables."
+    required: false
+  jvm-options:
+    description: "Edit the app's JVM options. A String containing JVM Options. Example: `-Xms1024m -Xmx2048m`"
+    required: false
+  runtime-version:
+    description: 'The runtime on which the app will run.'
+    required: false
+    default: 'Java_11'
+  dotnetcore-mainentry-path:
+    description: 'The path to the .NET executable relative to zip root.'
+    required: false
+  version:
+    description: 'The runtime on which the app will run.'
+    required: false
+branding:
+  icon: 'icon.svg'
+runs:
+  using: 'node12'
+  main: 'lib/main.js'
