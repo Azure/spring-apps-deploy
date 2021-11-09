@@ -18,7 +18,7 @@ describe('Test azure-spring-cloud-deployment-provider', () => {
         const params: ActionParameters = {
             azureSubscription: 'AzureSubscription',
             serviceName: 'ServiceName',
-            action: 'set production',
+            action: 'set-production',
             appName: 'AppName',
             useStagingDeployment: true
         }
@@ -34,7 +34,7 @@ describe('Test azure-spring-cloud-deployment-provider', () => {
         const params: ActionParameters = {
             azureSubscription: 'AzureSubscription',
             serviceName: 'ServiceName',
-            action: 'delete staging deployment',
+            action: 'delete-staging-deployment',
             appName: 'AppName'
         }
         const actionParamsSpy = jest.spyOn(ActionParametersUtility, 'getParameters').mockReturnValue(params);
