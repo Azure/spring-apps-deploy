@@ -3,12 +3,18 @@ import {AzureSpringCloudDeploymentProvider} from "./DeploymentProvider/AzureSpri
 
 export async function main() {
 
-  core.debug('Starting deployment task execution');
-  let deploymentProvider = new AzureSpringCloudDeploymentProvider();
-  core.debug("Pre-deployment Step Started");
-  await deploymentProvider.preDeploymentStep();
-  core.debug("Deployment Step Started");
-  await deploymentProvider.deployAppStep();
+  try {
+    core.debug('Starting deployment task execution');
+    let deploymentProvider = new AzureSpringCloudDeploymentProvider();
+    core.debug("Pre-deployment Step Started");
+    await deploymentProvider.preDeploymentStep();
+    core.debug("Deployment Step Started");
+    await deploymentProvider.deployAppStep();
+  }
+  catch (error) {
+      core.setFailed("Action failed with error: " + error.message);
+  }
 }
 
 main();
+

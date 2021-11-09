@@ -47,7 +47,7 @@ export class AzureSpringCloudDeploymentProvider {
         if (serviceResponse._response.status != 200) {
             throw Error('GetServiceError: ' + this.params.serviceName);
         }
-        this.logDetail = `for service ${this.params.serviceName} app ${this.params.appName}`;
+        this.logDetail = `service ${this.params.serviceName} app ${this.params.appName}`;
     }
 
     public async deployAppStep() {
@@ -74,85 +74,91 @@ export class AzureSpringCloudDeploymentProvider {
     }
 
     private async performDeleteStagingDeploymentAction() {
-        const deploymentName = await dh.getStagingDeploymentName(this.client, this.params);
-        this.params.deploymentName = deploymentName;
+        let deploymentName = this.params.deploymentName;
+        if (!deploymentName) {
+            deploymentName = await dh.getStagingDeploymentName(this.client, this.params);
+            this.params.deploymentName = deploymentName;
+        }
         if (deploymentName) {
-            console.log(`Delete staging deployment action ${this.logDetail} to deployment ${deploymentName}.`);
+            console.log(`Delete staging deployment action for ${this.logDetail} to deployment ${deploymentName}.`);
             await dh.deleteDeployment(this.client, this.params);
         } else {
-            throw Error(`No staging deployment ${this.logDetail}`);
+            throw Error(`No staging deployment in ${this.logDetail}`);
         }
-        console.log('Delete staging deployment action successful.');
+        console.log(`Delete staging deployment action successful for ${this.logDetail} to deployment ${deploymentName}..`);
         return deploymentName;
     }
 
     private async performSetProductionAction() {
         let deploymentName: string;
-        if (this.params.useStagingDeployment) {
-            console.log('Set production deployment to the current inactive deployment.');
+        if (this.params.deploymentName) {
+            console.log(`Set production action for ${this.logDetail} to the specific deployment ${this.params.deploymentName}`);
+            deploymentName = this.params.deploymentName;
+            let existingStagingDeploymentNames: Array<string> = await dh.getStagingDeploymentNames(this.client, this.params);
+            if (!existingStagingDeploymentNames.includes(deploymentName)) {
+                throw Error(`Staging deployment ${deploymentName} not exist in ${this.logDetail}.`);
+            }
+            await dh.setActiveDeployment(this.client, this.params);
+        } else if (this.params.useStagingDeployment) {
+            console.log(`Set production deployment for ${this.logDetail} to the current inactive deployment.`);
             deploymentName = await dh.getStagingDeploymentName(this.client, this.params);
             this.params.deploymentName = deploymentName;
             if (!deploymentName) { //If no inactive deployment exists, we cannot continue as instructed.
-                throw Error(`No staging deployment ${this.logDetail}`);
+                throw Error(`No staging deployment in ${this.logDetail}`);
             }
+            await dh.setActiveDeployment(this.client, this.params);
         } else {
-            //Verify that the named deployment actually exists.
-            console.log('Set production deployment to the specific deployment name.');
-            deploymentName = this.params.deploymentName;
-            let existingStagingDeploymentName: string = await dh.getStagingDeploymentName(this.client, this.params);
-            if (deploymentName != existingStagingDeploymentName) {
-                throw Error(`Staging deployment with name not exist ${this.logDetail} to deployment ${deploymentName}.`);
-            }
+            throw Error(`Set production deployment action should use-staging-deployment or specify deployment-name`);
         }
-        console.log(`Set production action ${this.logDetail} to deployment ${deploymentName}`);
-        await dh.setActiveDeployment(this.client, this.params);
-        console.log('Set production action successful.');
+
+        console.log(`Set production action successful for ${this.logDetail} to deployment ${deploymentName}.`);
     }
 
     private async performDeployAction() {
         let sourceType: string = this.determineSourceType(this.params.Package);
-
         //If uploading a source folder, compress to tar.gz file.
         let fileToUpload: string = sourceType == SourceType.SOURCE_DIRECTORY
             ? await this.compressSourceDirectory(this.params.Package.getPath())
             : this.params.Package.getPath();
-
-
         let deploymentName: string;
-        if (this.params.useStagingDeployment) {
-            deploymentName = await dh.getStagingDeploymentName(this.client, this.params);
 
-            if (!deploymentName) { //If no inactive deployment exists
-                console.log('No inactive deployment exists when deploying.');
-                if (this.params.createNewDeployment) {
-                    console.log('New deployment will be created');
-                    deploymentName = this.defaultInactiveDeploymentName; //Create a new deployment with the default name.
-                    this.params.deploymentName = deploymentName;
-                } else
-                    throw Error(`No staging deployment ${this.logDetail}`);
-            }
-        } else { //Deploy to deployment with specified name
-            console.log('Deploying with specified name.');
+        if (this.params.deploymentName) {
+            console.log(`Deploying for ${this.logDetail} to deployment ${this.params.deploymentName}.`);
             deploymentName = this.params.deploymentName;
             let deploymentNames: Array<string> = await dh.getAllDeploymentsName(this.client, this.params);
             if (!deploymentNames || !deploymentNames.includes(deploymentName)) {
                 console.log(`Deployment ${deploymentName} does not exist`);
                 if (this.params.createNewDeployment) {
                     if (deploymentNames.length > 1) {
-                        throw Error(`Two deployments already exist ${this.logDetail}`);
+                        throw Error(`More than 1 deployments already exist in ${this.logDetail}: ${JSON.stringify(deploymentNames)}`);
                     } else {
-                        console.log('New Deployment will be created.');
+                        console.log(`New Deployment will be created for ${this.logDetail}.`);
                     }
                 } else {
-                    throw Error(`Deployment doesn\'t exist ${this.logDetail} to deployment ${deploymentName}`);
+                    throw Error(`Deployment ${deploymentName} doesn\'t exist in ${this.logDetail}`);
                 }
-
+            }
+        } else if (this.params.useStagingDeployment) {
+            deploymentName = await dh.getStagingDeploymentName(this.client, this.params);
+            if (!deploymentName) { //If no inactive deployment exists
+                console.log(`No staging deployment was found in ${this.logDetail}.`);
+                if (this.params.createNewDeployment) {
+                    console.log(`New deployment ${this.defaultInactiveDeploymentName} will be created in ${this.logDetail}`);
+                    deploymentName = this.defaultInactiveDeploymentName; //Create a new deployment with the default name.
+                    this.params.deploymentName = deploymentName;
+                } else
+                    throw Error(`No staging deployment in ${this.logDetail}`);
+            }
+        } else {
+            deploymentName = await dh.getProductionDeploymentName(this.client, this.params);
+            this.params.deploymentName = deploymentName;
+            if(!deploymentName) {
+                throw Error(`Production deployment does not exist in ${this.logDetail}.`);
             }
         }
 
-        console.log(`Deploy for service ${this.params.serviceName} app ${this.params.appName} to deployment ${deploymentName}.`);
         await dh.deploy(this.client, this.params, sourceType, fileToUpload);
-        console.log('Deploy action successful.');
+        console.log(`Deploy action successful for ${this.logDetail} to deployment ${deploymentName}.`);
 
     }
 

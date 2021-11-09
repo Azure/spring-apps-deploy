@@ -19,9 +19,11 @@ describe('Test azure-spring-cloud-deployment-provider', () => {
             azureSubscription: 'AzureSubscription',
             serviceName: 'ServiceName',
             action: 'set production',
-            appName: 'AppName'
+            appName: 'AppName',
+            useStagingDeployment: true
         }
         const actionParamsSpy = jest.spyOn(ActionParametersUtility, 'getParameters').mockReturnValue(params);
+        const stagingSpy = jest.spyOn(DeploymentHelper, 'getStagingDeploymentName').mockImplementation(async () => 'staging');
         let provider: AzureSpringCloudDeploymentProvider = new AzureSpringCloudDeploymentProvider();
         await provider.deployAppStep();
         expect(DeploymentHelper.setActiveDeployment).toBeCalledTimes(1);

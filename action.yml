@@ -1,5 +1,5 @@
 # azure spirng cloud action
-name: 'AzureSpringCloud'
+name: 'Azure Spring Cloud'
 description: 'Deploy applications to Azure Spring Cloud and manage deployments.'
 inputs: 
   azure-subscription:
@@ -8,7 +8,7 @@ inputs:
   action:
     description: 'Action to be performed on Azure Spring Cloud.'
     required: true
-    default: 'Deploy'
+    default: 'deploy'
   service-name:
     description: 'Select the Azure Spring Cloud service to which to deploy.'
     required: true
