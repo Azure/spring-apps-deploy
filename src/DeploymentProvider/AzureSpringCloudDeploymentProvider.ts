@@ -139,6 +139,7 @@ export class AzureSpringCloudDeploymentProvider {
                 }
             }
         } else if (this.params.useStagingDeployment) {
+            console.log(`Deploying to the staging deployment of ${this.logDetail}.`);
             deploymentName = await dh.getStagingDeploymentName(this.client, this.params);
             if (!deploymentName) { //If no inactive deployment exists
                 console.log(`No staging deployment was found in ${this.logDetail}.`);
@@ -150,6 +151,7 @@ export class AzureSpringCloudDeploymentProvider {
                     throw Error(`No staging deployment in ${this.logDetail}`);
             }
         } else {
+            console.log(`Deploying to the production deployment of ${this.logDetail}.`);
             deploymentName = await dh.getProductionDeploymentName(this.client, this.params);
             this.params.deploymentName = deploymentName;
             if(!deploymentName) {

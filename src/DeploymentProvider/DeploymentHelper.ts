@@ -6,12 +6,14 @@ import { parse } from 'azure-actions-utility/parameterParserUtility';
 
 export class DeploymentHelper {
 
-    private static readonly SUCCESS_CODE: Array<number> = [200, 201, 202];
+    private static readonly CREATE_OR_UPDATE_SUCCESS_CODE: Array<number> = [200];
+    private static readonly DELETE_SUCCESS_CODE: Array<number> = [200, 204];
+    private static readonly GET_SUCCESS_CODE: Array<number> = [200];
 
     private static async listDeployments(client: AppPlatformManagementClient, params: ActionParameters): Promise<Models.DeploymentsListResponse> {
         const deployments: Models.DeploymentsListResponse = await client.deployments.list(params.resourceGroupName, params.serviceName, params.appName);
         core.debug('list deployments response: ' + deployments._response.bodyAsText);
-        if (!this.SUCCESS_CODE.includes(deployments._response.status)) {
+        if (!this.GET_SUCCESS_CODE.includes(deployments._response.status)) {
             throw Error('ListDeploymentsError');
         }
         return deployments;
@@ -75,7 +77,7 @@ export class DeploymentHelper {
         };
         const updateResponse: Models.AppsUpdateResponse = await client.apps.update(params.resourceGroupName, params.serviceName, params.appName, appResource);
         core.debug('set active deployment response: ' + updateResponse._response.bodyAsText);
-        if (!this.SUCCESS_CODE.includes(updateResponse._response.status)) {
+        if (!this.CREATE_OR_UPDATE_SUCCESS_CODE.includes(updateResponse._response.status)) {
             throw Error('SetActiveDeploymentError');
         }
         return;
@@ -84,7 +86,7 @@ export class DeploymentHelper {
     public static async deploy(client: AppPlatformManagementClient, params: ActionParameters, sourceType: string, fileToUpload: string) {
         let uploadResponse: Models.AppsGetResourceUploadUrlResponse = await client.apps.getResourceUploadUrl(params.resourceGroupName, params.serviceName, params.appName);
         core.debug('request upload url response: ' + uploadResponse._response.bodyAsText);
-        if (uploadResponse._response.status in this.SUCCESS_CODE) {
+        if (!this.GET_SUCCESS_CODE.includes(uploadResponse._response.status)) {
             throw Error('RequestUploadUrlError');
         }
         await uploadFileToSasUrl(uploadResponse.uploadUrl, fileToUpload);
@@ -116,7 +118,7 @@ export class DeploymentHelper {
         core.debug("deploymentResource: " + JSON.stringify(deploymentResource));
         const response = await client.deployments.createOrUpdate(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
         core.debug('deploy response: ' + response._response.bodyAsText);
-        if (!this.SUCCESS_CODE.includes(response._response.status)) {
+        if (!this.CREATE_OR_UPDATE_SUCCESS_CODE.includes(response._response.status)) {
             throw Error('DeployError');
         }
         return;
@@ -125,7 +127,7 @@ export class DeploymentHelper {
     public static async deleteDeployment(client: AppPlatformManagementClient, params: ActionParameters) {
         const response = await client.deployments.deleteMethod(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName);
         core.debug('delete deployment response: ' + response._response.bodyAsText);
-        if (!this.SUCCESS_CODE.includes(response._response.status)) {
+        if (!this.DELETE_SUCCESS_CODE.includes(response._response.status)) {
             throw Error('DeleteDeploymentError');
         }
         return;
