@@ -44,7 +44,7 @@ name: AzureSpringCloud
 on: push
 env:
   ASC_PACKAGE_PATH: ${{ github.workspace }}
-  AZURE_SUBSCRIPTION: <azure subscription name>
+  AZURE_SUBSCRIPTION: <azure subscription id>
 
 jobs:
   deploy_to_production:
@@ -52,7 +52,7 @@ jobs:
     name: deploy to production with artifact
     steps:
       - name: Checkout Github Action
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
         
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
@@ -86,7 +86,7 @@ name: AzureSpringCloud
 on: push
 env:
   ASC_PACKAGE_PATH: ${{ github.workspace }}
-  AZURE_SUBSCRIPTION: <azure subscription name>
+  AZURE_SUBSCRIPTION: <azure subscription id>
 
 jobs:
   deploy_to_production:
@@ -94,7 +94,7 @@ jobs:
     name: deploy to production with soruce code
     steps:
       - name: Checkout Github Action
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: Login via Azure CLI
         uses: azure/login@v1

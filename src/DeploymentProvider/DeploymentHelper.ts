@@ -10,13 +10,40 @@ export class DeploymentHelper {
     private static readonly DELETE_SUCCESS_CODE: Array<number> = [200, 204];
     private static readonly GET_SUCCESS_CODE: Array<number> = [200];
 
+    private static listDeploymentsResult: Models.DeploymentsListResponse = null;
+
     private static async listDeployments(client: AppPlatformManagementClient, params: ActionParameters): Promise<Models.DeploymentsListResponse> {
+        if (this.listDeploymentsResult != null) {
+            core.debug('list from cache, list deployments response: ' + this.listDeploymentsResult._response.bodyAsText);
+            return this.listDeploymentsResult;
+        }
         const deployments: Models.DeploymentsListResponse = await client.deployments.list(params.resourceGroupName, params.serviceName, params.appName);
         core.debug('list deployments response: ' + deployments._response.bodyAsText);
         if (!this.GET_SUCCESS_CODE.includes(deployments._response.status)) {
             throw Error('ListDeploymentsError');
         }
+        this.listDeploymentsResult = deployments;
         return deployments;
+    }
+
+    private static async getDeployment(client: AppPlatformManagementClient, params: ActionParameters, deploymentName: string): Promise<Models.DeploymentResource> {
+        if (this.listDeploymentsResult != null) {
+            core.debug('get from list cache, list deployments response: ' + this.listDeploymentsResult._response.bodyAsText);
+            let ret: Models.DeploymentResource;
+            this.listDeploymentsResult.forEach(deployment => {
+                core.debug('deployment str: ' + JSON.stringify(deployment));
+                if (deployment.name == deploymentName) {
+                    ret = deployment;
+                }
+            });
+            return ret;
+        }
+        const getResponse: Models.DeploymentsGetResponse = await client.deployments.get(params.resourceGroupName, params.serviceName, params.appName, deploymentName);
+        core.debug('get deployments response: ' + getResponse._response.bodyAsText);
+        if (!this.GET_SUCCESS_CODE.includes(getResponse._response.status)) {
+            throw Error('GetDeploymentsError');
+        }
+        return getResponse;
     }
 
     public static async getStagingDeploymentNames(client: AppPlatformManagementClient, params: ActionParameters): Promise<Array<string>> {
@@ -90,6 +117,30 @@ export class DeploymentHelper {
             throw Error('RequestUploadUrlError');
         }
         await uploadFileToSasUrl(uploadResponse.uploadUrl, fileToUpload);
+        let getDeploymentName = params.deploymentName;
+        if (params.createNewDeployment) {
+            getDeploymentName = await this.getProductionDeploymentName(client, params);
+        }
+        let getResponse: Models.DeploymentResource = await this.getDeployment(client, params, getDeploymentName);
+        let deploymentResource: Models.DeploymentResource;
+        let sourcePart: Models.UserSourceInfo = {
+            relativePath: uploadResponse.relativePath,
+            type: sourceType as Models.UserSourceType
+        };
+        if(params.version) {
+            sourcePart.version = params.version;
+        }
+        let deploymentSettingsPart: Models.DeploymentSettings = {
+        };
+        if (params.jvmOptions) {
+            deploymentSettingsPart.jvmOptions = params.jvmOptions;
+        }
+        if (params.dotNetCoreMainEntryPath) {
+            deploymentSettingsPart.netCoreMainEntryPath = params.dotNetCoreMainEntryPath;
+        }
+        if (params.runtimeVersion) {
+            deploymentSettingsPart.runtimeVersion = params.runtimeVersion as Models.RuntimeVersion;
+        }
         let transformedEnvironmentVariables = {};
         if (params.environmentVariables) {
             core.debug("Environment variables modified.");
@@ -99,21 +150,25 @@ export class DeploymentHelper {
                 transformedEnvironmentVariables[key] = parsedEnvVariables[key]['value'];
             });
             core.debug('Environment Variables: ' + JSON.stringify(transformedEnvironmentVariables));
+            deploymentSettingsPart.environmentVariables = transformedEnvironmentVariables;
         }
-        let deploymentResource: Models.DeploymentResource = {
-            properties: {
-                source: {
-                    relativePath: uploadResponse.relativePath,
-                    type: sourceType as Models.UserSourceType,
-                    version: params.version
+        if (getResponse) {
+            let source = {...getResponse.properties.source, ...sourcePart};
+            let deploymentSettings = {...getResponse.properties.deploymentSettings, ...deploymentSettingsPart};
+            deploymentResource = {
+                properties: {
+                    source: source,
+                    deploymentSettings: deploymentSettings
                 },
-                deploymentSettings: {
-                    jvmOptions: params.jvmOptions,
-                    netCoreMainEntryPath: params.dotNetCoreMainEntryPath,
-                    runtimeVersion: params.runtimeVersion as Models.RuntimeVersion,
-                    environmentVariables: transformedEnvironmentVariables
+                sku: getResponse.sku
+            };
+        } else {
+            deploymentResource = {
+                properties: {
+                    source: sourcePart,
+                    deploymentSettings: deploymentSettingsPart
                 }
-            }
+            };
         }
         core.debug("deploymentResource: " + JSON.stringify(deploymentResource));
         const response = await client.deployments.createOrUpdate(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);

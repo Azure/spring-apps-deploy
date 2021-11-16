@@ -39,7 +39,6 @@ inputs:
   runtime-version:
     description: 'The runtime on which the app will run.'
     required: false
-    default: 'Java_11'
   dotnetcore-mainentry-path:
     description: 'The path to the .NET executable relative to zip root.'
     required: false
