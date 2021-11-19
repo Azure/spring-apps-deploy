@@ -178,6 +178,26 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
           app-name: <app name>
 ```
 
+## Arguments
+> [!NOTE]
+> Some arguments are only applicable for certain settings of the `action` argument. The Action column below specifies the pertinent actions for each argument. Any argument listed as Required is only required for the pertinent Action(s).
+
+|Argument|<div style="width:100px">Action</div>|Required|Description|
+|--- |--- |--- |--- |
+|`action`|all|Required| The action to be performed by this task.<br/>One of: `deploy`, `set-production`, `delete-staging-deployment`<br/>Default value: `deploy`|
+|`azure-subscription`|all|Required| The Azure subscription ID for the target Azure Spring Cloud instance.|
+|`service-name`|all|Required| The name of the Azure Spring Cloud service instance.|
+|`app-name`|all|Required| The name of the Azure Spring Cloud app to deploy. The app must exist prior to task execution.
+|`use-staging-deployment`|deploy<br/>set-production|Optional| If set to `true`, apply the task to whichever deployment is set as the staging deployment at time of execution. If set to `false`, apply the task to the production deployment.<br/>Default value: `true`|
+|`deployment-name`|deploy<br/>set-production|Optional| The name of the deployment to which the action will apply. It overrides the setting of `use-staging-deployment`.|
+|`create-new-deployment`|deploy|Optional| If set to `true` and the deployment specified by `deployment-name` does not exist at execution time, it will be created.<br/>Default value: `false`|
+|`package`|deploy|Required| The file path to the package containing the application to be deployed (`.jar` file for Java, `.zip` for .NET Core) or to a folder containing the application source to be built. <br/>Default value: ```${{ github.workspace }}/**/*.jar```|
+|`runtime-version`|deploy|Optional| The runtime stack for the application.<br/>One of: `Java_8`, `Java_11`, `NetCore_31`,<br/>Default value: `Java_11`|
+|`environment-variables`|deploy|Optional| Environment variables to be entered using the syntax &#39;-key value&#39;. Values containing spaces should be enclosed in double quotes. <br/>Example: ```-CUSTOMER_NAME Contoso -WEBSITE_TIME_ZONE "Eastern Standard Time"```|
+|`jvm-options`|deploy|Optional| A string containing JVM Options. <br/> Example: `-Dspring.profiles.active=mysql`|
+|`dotnetcore-mainentry-path`|deploy|Optional| A string containing the path to the .NET executable relative to zip root.|
+|`version`|deploy|Optional| The deployment version. If not set, the version is left unchanged.|
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
