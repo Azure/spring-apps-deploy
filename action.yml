@@ -1,19 +1,19 @@
-# azure spirng cloud action
-name: 'Azure Spring Cloud'
-description: 'Deploy applications to Azure Spring Cloud and manage deployments.'
+# azure spirng apps action
+name: 'Azure Spring Apps'
+description: 'Deploy applications to Azure Spring Apps and manage deployments.'
 inputs: 
   azure-subscription:
     description: 'Select the Azure Resource Manager subscription for the deployment.'
     required: true
   action:
-    description: 'Action to be performed on Azure Spring Cloud.'
+    description: 'Action to be performed on Azure Spring Apps.'
     required: true
     default: 'deploy'
   service-name:
-    description: 'Select the Azure Spring Cloud service to which to deploy.'
+    description: 'Select the Azure Spring Apps service to which to deploy.'
     required: true
   app-name:
-    description: 'Select the Azure Spring Cloud app to deploy.'
+    description: 'Select the Azure Spring Apps app to deploy.'
     required: true
   use-staging-deployment:
     description: "Automatically select the deployment that's set as Staging at the time the task runs."
@@ -27,7 +27,7 @@ inputs:
     description: 'The deployment to which this task will apply. Lowercase letters, - and numbers only; must start with a letter.'
     required: false
   package:
-    description: "File path to the package or a folder containing the Spring Cloud app contents."
+    description: "File path to the package or a folder containing the Spring Apps app contents."
     required: false
     default: '${{ github.workspace }}/**/*.jar'
   environment-variables:

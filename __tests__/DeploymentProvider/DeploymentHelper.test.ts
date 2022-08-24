@@ -6,7 +6,7 @@ import {DeploymentHelper} from "../../src/DeploymentProvider/DeploymentHelper";
 jest.mock('@azure/identity');
 jest.mock('@actions/core');
 
-describe('Test azure-spring-cloud-deployment-helper', () => {
+describe('Test azure-spring-apps-deployment-helper', () => {
     afterEach(() => {
         jest.restoreAllMocks();
     })

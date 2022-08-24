@@ -1,7 +1,7 @@
 {
-  "name": "spring-cloud-deploy",
+  "name": "spring-apps-deploy",
   "version": "1.0.0",
-  "description": "spring-cloud-deploy",
+  "description": "spring-apps-deploy",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RuoyuWang-MS/spring-cloud-deploy.git"
+    "url": "git+https://github.com/RuoyuWang-MS/spring-apps-deploy.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/RuoyuWang-MS/spring-cloud-deploy/issues"
+    "url": "https://github.com/RuoyuWang-MS/spring-apps-deploy/issues"
   },
-  "homepage": "https://github.com/RuoyuWang-MS/spring-cloud-deploy#readme",
+  "homepage": "https://github.com/RuoyuWang-MS/spring-apps-deploy#readme",
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/node": "^16.11.6",

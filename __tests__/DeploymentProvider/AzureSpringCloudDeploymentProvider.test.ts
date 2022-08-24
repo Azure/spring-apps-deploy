@@ -1,14 +1,14 @@
 
 import {ActionParameters, ActionParametersUtility} from "../../src/operations/ActionParameters";
 import {DeploymentHelper} from "../../src/DeploymentProvider/DeploymentHelper";
-import {AzureSpringCloudDeploymentProvider} from "../../src/DeploymentProvider/AzureSpringCloudDeploymentProvider";
+import {AzureSpringAppsDeploymentProvider} from "../../src/DeploymentProvider/AzureSpringAppsDeploymentProvider";
 
 jest.mock('@azure/identity');
 jest.mock('@actions/core');
 jest.mock('@azure/arm-appplatform')
 jest.mock('../../src/DeploymentProvider/DeploymentHelper')
 
-describe('Test azure-spring-cloud-deployment-provider', () => {
+describe('Test azure-spring-apps-deployment-provider', () => {
 
     afterEach(() => {
         jest.restoreAllMocks();
@@ -24,7 +24,7 @@ describe('Test azure-spring-cloud-deployment-provider', () => {
         }
         const actionParamsSpy = jest.spyOn(ActionParametersUtility, 'getParameters').mockReturnValue(params);
         const stagingSpy = jest.spyOn(DeploymentHelper, 'getStagingDeploymentName').mockImplementation(async () => 'staging');
-        let provider: AzureSpringCloudDeploymentProvider = new AzureSpringCloudDeploymentProvider();
+        let provider: AzureSpringAppsDeploymentProvider = new AzureSpringAppsDeploymentProvider();
         await provider.deployAppStep();
         expect(DeploymentHelper.setActiveDeployment).toBeCalledTimes(1);
         expect(DeploymentHelper.getStagingDeploymentName).toBeCalledTimes(1);
@@ -39,7 +39,7 @@ describe('Test azure-spring-cloud-deployment-provider', () => {
         }
         const actionParamsSpy = jest.spyOn(ActionParametersUtility, 'getParameters').mockReturnValue(params);
         const stagingSpy = jest.spyOn(DeploymentHelper, 'getStagingDeploymentName').mockImplementation( async () => 'staging');
-        let provider: AzureSpringCloudDeploymentProvider = new AzureSpringCloudDeploymentProvider();
+        let provider: AzureSpringAppsDeploymentProvider = new AzureSpringAppsDeploymentProvider();
         await provider.deployAppStep();
         expect(DeploymentHelper.deleteDeployment).toBeCalledTimes(1);
         expect(DeploymentHelper.getStagingDeploymentName).toBeCalledTimes(1);

@@ -7,7 +7,7 @@ import { getDefaultAzureCredential } from '@azure/identity'
 import { DeploymentHelper as dh } from "./DeploymentHelper";
 import * as tar from 'tar';
 
-export class AzureSpringCloudDeploymentProvider {
+export class AzureSpringAppsDeploymentProvider {
 
     defaultInactiveDeploymentName = 'staging';
 
@@ -40,7 +40,7 @@ export class AzureSpringCloudDeploymentProvider {
             this.params.resourceGroupName = match[0];
             console.log('service resource group name: ' + this.params.resourceGroupName);
         } else { //Should never ever ever happen
-            throw new Error('DuplicateAzureSpringCloudName: ' + this.params.serviceName);
+            throw new Error('DuplicateAzureSpringAppsName: ' + this.params.serviceName);
         }
         const serviceResponse = await this.client.services.get(this.params.resourceGroupName, this.params.serviceName);
         core.debug("service response: " + serviceResponse._response.bodyAsText);
