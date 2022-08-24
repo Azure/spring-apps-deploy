@@ -1,6 +1,6 @@
-# GitHub Action for deploying to Azure Spring Cloud
+# GitHub Action for deploying to Azure Spring Apps
 
-GitHub Actions support an automated software development lifecycle workflow. With GitHub Actions for Azure Spring Cloud you can create workflows in your repository to manage your deployment of Azure Spring Cloud conveniently.
+GitHub Actions support an automated software development lifecycle workflow. With GitHub Actions for Azure Spring Apps you can create workflows in your repository to manage your deployment of Azure Spring Apps conveniently.
 
 ## Prerequisites
 ### Set up GitHub repository and authenticate
@@ -36,11 +36,11 @@ The command should output a JSON object:
 ## End-to-End Sample Workflows
 ### Deploying
 #### To production
-Azure Spring Cloud supports deploying to deployments with built artifacts (e.g., JAR or .NET Core ZIP) or source code archive.
-The following example deploys to the default production deployment in Azure Spring Cloud using JAR file built by Maven. This is the only possible deployment scenario when using the Basic SKU:
+Azure Spring Apps supports deploying to deployments with built artifacts (e.g., JAR or .NET Core ZIP) or source code archive.
+The following example deploys to the default production deployment in Azure Spring Apps using JAR file built by Maven. This is the only possible deployment scenario when using the Basic SKU:
 
 ```yml
-name: AzureSpringCloud
+name: AzureSpringApps
 on: push
 env:
   ASC_PACKAGE_PATH: ${{ github.workspace }}
@@ -69,7 +69,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: deploy to production with artifact
-        uses: azure/spring-cloud-deploy@v1
+        uses: azure/spring-apps-deploy@v1
         with:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
           action: Deploy
@@ -79,10 +79,10 @@ jobs:
           package: ${{ env.ASC_PACKAGE_PATH }}/**/*.jar
 ```
 
-The following example deploys to the default production deployment in Azure Spring Cloud using source code.
+The following example deploys to the default production deployment in Azure Spring Apps using source code.
 
 ```yml
-name: AzureSpringCloud
+name: AzureSpringApps
 on: push
 env:
   ASC_PACKAGE_PATH: ${{ github.workspace }}
@@ -102,7 +102,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: deploy to production step with soruce code
-        uses: azure/spring-cloud-deploy@v1
+        uses: azure/spring-apps-deploy@v1
         with:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
           action: deploy
@@ -114,13 +114,13 @@ jobs:
 
 #### Blue-green
 
-The following examples deploy to an existing staging deployment. This deployment will not receive production traffic until it is set as a production deployment. You can set use-staging-deployment true to find the staging deployment automatically or just allocate specific deployment-name. We will only focus on the spring-cloud-deploy action and leave out the preparatory jobs in the rest of the article.
+The following examples deploy to an existing staging deployment. This deployment will not receive production traffic until it is set as a production deployment. You can set use-staging-deployment true to find the staging deployment automatically or just allocate specific deployment-name. We will only focus on the spring-apps-deploy action and leave out the preparatory jobs in the rest of the article.
 
 ```yml
 # environment preparation configurations omitted
     steps:
       - name: blue green deploy step use-staging-deployment
-        uses: azure/spring-cloud-deploy@v1
+        uses: azure/spring-apps-deploy@v1
         with:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
           action: deploy
@@ -134,7 +134,7 @@ The following examples deploy to an existing staging deployment. This deployment
 # environment preparation configurations omitted
     steps:
       - name: blue green deploy step with deployment-name
-        uses: azure/spring-cloud-deploy@v1
+        uses: azure/spring-apps-deploy@v1
         with:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
           action: deploy
@@ -144,7 +144,7 @@ The following examples deploy to an existing staging deployment. This deployment
           package: ${{ env.ASC_PACKAGE_PATH }}/**/*.jar
 ```
 
-For more information on blue-green deployments, including an alternative approach, see [Blue-green deployment strategies](https://docs.microsoft.com/en-us/azure/spring-cloud/concepts-blue-green-deployment-strategies).
+For more information on blue-green deployments, including an alternative approach, see [Blue-green deployment strategies](https://docs.microsoft.com/en-us/azure/spring-apps/concepts-blue-green-deployment-strategies).
 
 ### Setting production deployment
 
@@ -154,7 +154,7 @@ The following example will set the current staging deployment as production, eff
 # environment preparation configurations omitted
     steps:
       - name: set production deployment step
-        uses: azure/spring-cloud-deploy@v1
+        uses: azure/spring-apps-deploy@v1
         with:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
           action: set-production
@@ -170,7 +170,7 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
 # environment preparation configurations omitted
     steps:
       - name: Delete staging deployment step
-        uses: azure/spring-cloud-deploy@v1
+        uses: azure/spring-apps-deploy@v1
         with:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
           action: delete-staging-deployment
@@ -185,9 +185,9 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
 |Argument|<div style="width:100px">Action</div>|Required|Description|
 |--- |--- |--- |--- |
 |`action`|all|Required| The action to be performed by this task.<br/>One of: `deploy`, `set-production`, `delete-staging-deployment`<br/>Default value: `deploy`|
-|`azure-subscription`|all|Required| The Azure subscription ID for the target Azure Spring Cloud instance.|
-|`service-name`|all|Required| The name of the Azure Spring Cloud service instance.|
-|`app-name`|all|Required| The name of the Azure Spring Cloud app to deploy. The app must exist prior to task execution.
+|`azure-subscription`|all|Required| The Azure subscription ID for the target Azure Spring Apps instance.|
+|`service-name`|all|Required| The name of the Azure Spring Apps service instance.|
+|`app-name`|all|Required| The name of the Azure Spring Apps app to deploy. The app must exist prior to task execution.
 |`use-staging-deployment`|deploy<br/>set-production|Optional| If set to `true`, apply the task to whichever deployment is set as the staging deployment at time of execution. If set to `false`, apply the task to the production deployment.<br/>Default value: `true`|
 |`deployment-name`|deploy<br/>set-production|Optional| The name of the deployment to which the action will apply. It overrides the setting of `use-staging-deployment`.|
 |`create-new-deployment`|deploy|Optional| If set to `true` and the deployment specified by `deployment-name` does not exist at execution time, it will be created.<br/>Default value: `false`|

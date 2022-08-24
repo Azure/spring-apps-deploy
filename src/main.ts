@@ -1,11 +1,11 @@
 import * as core from '@actions/core';
-import {AzureSpringCloudDeploymentProvider} from "./DeploymentProvider/AzureSpringCloudDeploymentProvider";
+import {AzureSpringAppsDeploymentProvider} from "./DeploymentProvider/AzureSpringAppsDeploymentProvider";
 
 export async function main() {
 
   try {
     core.debug('Starting deployment task execution');
-    let deploymentProvider = new AzureSpringCloudDeploymentProvider();
+    let deploymentProvider = new AzureSpringAppsDeploymentProvider();
     core.debug("Pre-deployment Step Started");
     await deploymentProvider.preDeploymentStep();
     core.debug("Deployment Step Started");
