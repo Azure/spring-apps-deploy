@@ -45,6 +45,9 @@ inputs:
   version:
     description: 'The runtime on which the app will run.'
     required: false
+  builder:
+    description: '(Enterprise Tier Only) Build service builder used to build the executable.'
+    required: false
 branding:
   icon: 'icon.svg'
 runs:

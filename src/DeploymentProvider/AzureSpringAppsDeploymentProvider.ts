@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import { v4 as uuidv4 } from 'uuid';
 import { Package, PackageType } from 'azure-actions-utility/packageUtility';
 import { Actions, ActionParameters, ActionParametersUtility } from '../operations/ActionParameters';
-import { AppPlatformManagementClient, AppPlatformManagementModels as Models } from '@azure/arm-appplatform'
+import * as asa from '@azure/arm-appplatform'
 import { getDefaultAzureCredential } from '@azure/identity'
 import { DeploymentHelper as dh } from "./DeploymentHelper";
 import * as tar from 'tar';
@@ -12,7 +12,7 @@ export class AzureSpringAppsDeploymentProvider {
     defaultInactiveDeploymentName = 'staging';
 
     params: ActionParameters;
-    client: AppPlatformManagementClient;
+    client: asa.AppPlatformManagementClient;
     logDetail: string;
 
     constructor() {
@@ -21,14 +21,14 @@ export class AzureSpringAppsDeploymentProvider {
 
     public async preDeploymentStep() {
         const token = getDefaultAzureCredential();
-        this.client = new AppPlatformManagementClient(token, this.params.azureSubscription);
+        this.client = new asa.AppPlatformManagementClient(token, this.params.azureSubscription);
         const serviceList = await this.client.services.listBySubscription();
-        let filteredResources: Array<Models.ServiceResource> = [];
-        serviceList.forEach(service => {
+        let filteredResources: Array<asa.ServiceResource> = [];
+        for await (const service of serviceList) {
             if (service.name == this.params.serviceName) {
                 filteredResources.push(service);
             }
-        });
+        }
         if (!filteredResources || filteredResources.length == 0) {
             throw new Error('ResourceDoesntExist: ' + this.params.serviceName);
         } else if (filteredResources.length == 1) {
@@ -43,10 +43,10 @@ export class AzureSpringAppsDeploymentProvider {
             throw new Error('DuplicateAzureSpringAppsName: ' + this.params.serviceName);
         }
         const serviceResponse = await this.client.services.get(this.params.resourceGroupName, this.params.serviceName);
-        core.debug("service response: " + serviceResponse._response.bodyAsText);
-        if (serviceResponse._response.status != 200) {
-            throw Error('GetServiceError: ' + this.params.serviceName);
-        }
+        core.debug("service response: " + JSON.stringify(serviceResponse));
+        // if (serviceResponse._response.status != 200) {
+        //     throw Error('GetServiceError: ' + this.params.serviceName);
+        // }
         this.logDetail = `service ${this.params.serviceName} app ${this.params.appName}`;
     }
 
