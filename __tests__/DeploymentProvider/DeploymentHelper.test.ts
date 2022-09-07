@@ -1,4 +1,4 @@
-import { AppPlatformManagementClient, AppPlatformManagementModels as Models } from '@azure/arm-appplatform'
+import * as asa from '@azure/arm-appplatform'
 import * as identity from '@azure/identity'
 import {ActionParameters, ActionParametersUtility} from "../../src/operations/ActionParameters";
 import {DeploymentHelper} from "../../src/DeploymentProvider/DeploymentHelper";
@@ -10,9 +10,9 @@ describe('Test azure-spring-apps-deployment-helper', () => {
     afterEach(() => {
         jest.restoreAllMocks();
     })
-    let clientMock: jest.Mocked<AppPlatformManagementClient> = new AppPlatformManagementClient(new identity.DefaultAzureCredential(), '') as any;
+    let clientMock: jest.Mocked<asa.AppPlatformManagementClient> = new asa.AppPlatformManagementClient(new identity.DefaultAzureCredential(), '') as any;
     let paramsMock: jest.Mocked<ActionParameters> = {} as any;
-    let deploymentListMock: Array<Models.DeploymentResource> = [
+    let deploymentListMock: Array<asa.DeploymentResource> = [
         {
             properties: {
                 active: false
@@ -26,14 +26,14 @@ describe('Test azure-spring-apps-deployment-helper', () => {
             name: 'production'
         }
     ];
-    let responseMock: Models.DeploymentsListResponse = deploymentListMock as Models.DeploymentsListResponse
-    responseMock._response = {
-        headers: undefined,
-        request: undefined,
-        status: 200,
-        bodyAsText: '',
-        parsedBody: deploymentListMock
-    }
+    let responseMock: asa.DeploymentsListResponse = deploymentListMock as asa.DeploymentsListResponse
+    // responseMock._response = {
+    //     headers: undefined,
+    //     request: undefined,
+    //     status: 200,
+    //     bodyAsText: '',
+    //     parsedBody: deploymentListMock
+    // }
     clientMock.deployments.list = jest.fn().mockReturnValue(responseMock);
     test("get staging deployment name", async () => {
         const stagingName = await DeploymentHelper.getStagingDeploymentName(clientMock, paramsMock);

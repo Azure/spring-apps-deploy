@@ -39,14 +39,11 @@ export class AzureSpringAppsDeploymentProvider {
             }
             this.params.resourceGroupName = match[0];
             console.log('service resource group name: ' + this.params.resourceGroupName);
-        } else { //Should never ever ever happen
+        } else { //Should never happen
             throw new Error('DuplicateAzureSpringAppsName: ' + this.params.serviceName);
         }
         const serviceResponse = await this.client.services.get(this.params.resourceGroupName, this.params.serviceName);
         core.debug("service response: " + JSON.stringify(serviceResponse));
-        // if (serviceResponse._response.status != 200) {
-        //     throw Error('GetServiceError: ' + this.params.serviceName);
-        // }
         this.logDetail = `service ${this.params.serviceName} app ${this.params.appName}`;
     }
 

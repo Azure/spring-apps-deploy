@@ -6,10 +6,6 @@ import { parse } from 'azure-actions-utility/parameterParserUtility';
 
 export class DeploymentHelper {
 
-    private static readonly CREATE_OR_UPDATE_SUCCESS_CODE: Array<number> = [200];
-    private static readonly DELETE_SUCCESS_CODE: Array<number> = [200, 204];
-    private static readonly GET_SUCCESS_CODE: Array<number> = [200];
-
     private static listDeploymentsResult: Array<asa.DeploymentResource> = [];
 
     private static async listDeployments(client: asa.AppPlatformManagementClient, params: ActionParameters): Promise<Array<asa.DeploymentResource>> {
@@ -92,28 +88,17 @@ export class DeploymentHelper {
     }
 
     public static async setActiveDeployment(client: asa.AppPlatformManagementClient, params: ActionParameters) {
-        // let appResource: asa.AppResource = {
-        //     properties: {
-        //         activeDeploymentName: params.deploymentName
-        //     }
-        // };
         let activeDeploymentCollection: asa.ActiveDeploymentCollection = {
             activeDeploymentNames: [params.deploymentName]
         }
         const setActiveResponse: asa.AppsUpdateResponse = await client.apps.beginSetActiveDeploymentsAndWait(params.resourceGroupName, params.serviceName, params.appName, activeDeploymentCollection);
         core.debug('set active deployment response: ' + JSON.stringify(setActiveResponse));
-        // if (!this.CREATE_OR_UPDATE_SUCCESS_CODE.includes(updateResponse._response.status)) {
-        //     throw Error('SetActiveDeploymentError');
-        // }
         return;
     }
 
     public static async deploy(client: asa.AppPlatformManagementClient, params: ActionParameters, sourceType: string, fileToUpload: string) {
         let uploadResponse: asa.AppsGetResourceUploadUrlResponse = await client.apps.getResourceUploadUrl(params.resourceGroupName, params.serviceName, params.appName);
         core.debug('request upload url response: ' +  JSON.stringify(uploadResponse));
-        // if (!this.GET_SUCCESS_CODE.includes(uploadResponse._response.status)) {
-        //     throw Error('RequestUploadUrlError');
-        // }
         await uploadFileToSasUrl(uploadResponse.uploadUrl, fileToUpload);
         let getDeploymentName = params.deploymentName;
         if (params.createNewDeployment) {
@@ -171,18 +156,12 @@ export class DeploymentHelper {
         core.debug("deploymentResource: " + JSON.stringify(deploymentResource));
         const response = await client.deployments.beginCreateOrUpdateAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
         core.debug('deploy response: ' + JSON.stringify(response));
-        // if (!this.CREATE_OR_UPDATE_SUCCESS_CODE.includes(response._response.status)) {
-        //     throw Error('DeployError');
-        // }
         return;
     }
 
     public static async deleteDeployment(client: asa.AppPlatformManagementClient, params: ActionParameters) {
         const response = await client.deployments.beginDeleteAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName);
         core.debug('delete deployment response: ' + JSON.stringify(response));
-        // if (!this.DELETE_SUCCESS_CODE.includes(response._response.status)) {
-        //     throw Error('DeleteDeploymentError');
-        // }
         return;
     }
 }
