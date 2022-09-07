@@ -13,7 +13,7 @@ export class DeploymentHelper {
     private static listDeploymentsResult: Array<asa.DeploymentResource> = [];
 
     private static async listDeployments(client: asa.AppPlatformManagementClient, params: ActionParameters): Promise<Array<asa.DeploymentResource>> {
-        if (this.listDeploymentsResult != null) {
+        if (this.listDeploymentsResult.length > 0) {
             core.debug('list from cache, list deployments response: ' + JSON.stringify(this.listDeploymentsResult));
             return this.listDeploymentsResult;
         }
@@ -26,7 +26,7 @@ export class DeploymentHelper {
     }
 
     private static async getDeployment(client: asa.AppPlatformManagementClient, params: ActionParameters, deploymentName: string): Promise<asa.DeploymentResource> {
-        if (this.listDeploymentsResult != null) {
+        if (this.listDeploymentsResult.length > 0) {
             core.debug('get from list cache, list deployments response: ' + JSON.stringify(this.listDeploymentsResult));
             let ret: asa.DeploymentResource;
             this.listDeploymentsResult.forEach(deployment => {
