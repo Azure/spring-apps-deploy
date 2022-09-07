@@ -27,13 +27,6 @@ describe('Test azure-spring-apps-deployment-helper', () => {
         }
     ];
     let responseMock: asa.DeploymentsListResponse = deploymentListMock as asa.DeploymentsListResponse
-    // responseMock._response = {
-    //     headers: undefined,
-    //     request: undefined,
-    //     status: 200,
-    //     bodyAsText: '',
-    //     parsedBody: deploymentListMock
-    // }
     clientMock.deployments.list = jest.fn().mockReturnValue(responseMock);
     test("get staging deployment name", async () => {
         const stagingName = await DeploymentHelper.getStagingDeploymentName(clientMock, paramsMock);
