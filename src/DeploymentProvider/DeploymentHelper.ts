@@ -110,6 +110,7 @@ export class DeploymentHelper {
 
     public static async deployEnterprise(client: asa.AppPlatformManagementClient, params: ActionParameters, sourceType: string, fileToUpload: string, resourceId: string) {
         const buildServiceName = "default";
+        const buildName = `${params.appName}/${params.deploymentName}`;
         core.debug('Starting deploy for enterprise');
         const uploadResponse = await client.buildServiceOperations.getResourceUploadUrl(params.resourceGroupName, params.serviceName, buildServiceName);
         core.debug('request upload url response: ' +  JSON.stringify(uploadResponse));
@@ -126,9 +127,11 @@ export class DeploymentHelper {
             core.debug('Environment Variables: ' + JSON.stringify(parsedBuildEnvVariables));
             build.properties.env = parsedBuildEnvVariables;
         }
-        const buildResponse = await client.buildServiceOperations.createOrUpdateBuild(params.resourceGroupName, params.serviceName, buildServiceName, params.appName, build);
+        const buildResponse = await client.buildServiceOperations.createOrUpdateBuild(params.resourceGroupName, params.serviceName, buildServiceName, buildName, build);
         core.debug('build response: ' +  JSON.stringify(buildResponse));
-        const waitResponse = await client.buildServiceOperations.getBuildResult(params.resourceGroupName, params.serviceName, buildServiceName, params.appName, buildResponse.properties.triggeredBuildResult.id);
+        const regex = RegExp("[^/]+$");
+        const buildResultName = regex.exec(buildResponse.properties.triggeredBuildResult.id)[0];
+        const waitResponse = await client.buildServiceOperations.getBuildResult(params.resourceGroupName, params.serviceName, buildServiceName, buildName, buildResultName);
         core.debug('build result response: ' +  JSON.stringify(waitResponse));
         let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, buildResponse.properties.triggeredBuildResult.id);
         core.debug("deploymentResource: " + JSON.stringify(deploymentResource));
