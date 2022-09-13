@@ -16,6 +16,11 @@ export class Inputs {
     public static readonly DOTNETCORE_MAINENTRY_PATH = 'dotnetcore-mainentry-path';
     public static readonly VERSION = 'version';
     public static readonly PACKAGE = 'package';
+    public static readonly BUILDER = 'builder';
+    public static readonly BUILD_CPU = 'build-cpu';
+    public static readonly BUILD_MEMORY = 'build-memory';
+    public static readonly BUILD_ENV = 'build-env';
+    public static readonly CONFIG_FILE_PATTERNS = 'config-file-patterns';
 }
 
 export class Actions {
@@ -39,7 +44,12 @@ export class ActionParametersUtility {
             jvmOptions: core.getInput(Inputs.JVM_OPTIONS, {"required": false}),
             runtimeVersion: core.getInput(Inputs.RUNTIME_VERSION, {"required": false}),
             dotNetCoreMainEntryPath: core.getInput(Inputs.DOTNETCORE_MAINENTRY_PATH, {"required": false}),
-            version: core.getInput(Inputs.VERSION, {"required": false})
+            version: core.getInput(Inputs.VERSION, {"required": false}),
+            builder: core.getInput(Inputs.BUILDER, {"required": false}),
+            buildCpu: core.getInput(Inputs.BUILD_CPU, {"required": false}),
+            buildMemory: core.getInput(Inputs.BUILD_MEMORY, {"required": false}),
+            buildEnv: core.getInput(Inputs.BUILD_ENV, {"required": false}),
+            configFilePatterns: core.getInput(Inputs.CONFIG_FILE_PATTERNS, {"required": false})
         }
 
         //Do not attempt to parse package in non-deployment steps. This causes variable substitution errors.
@@ -68,4 +78,9 @@ export interface ActionParameters {
     runtimeVersion?: string;
     dotNetCoreMainEntryPath?: string;
     version?: string;
+    builder?: string;
+    buildCpu?: string;
+    buildMemory?: string;
+    buildEnv?: string;
+    configFilePatterns?: string;
 }
