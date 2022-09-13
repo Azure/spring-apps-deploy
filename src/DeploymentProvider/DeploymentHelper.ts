@@ -109,16 +109,16 @@ export class DeploymentHelper {
     }
 
     public static async deployEnterprise(client: asa.AppPlatformManagementClient, params: ActionParameters, sourceType: string, fileToUpload: string, resourceId: string) {
+        const buildServiceName = "default";
         core.debug('Starting deploy for enterprise');
-        const uploadResponse = await client.buildServiceOperations.getResourceUploadUrl(params.resourceGroupName, params.serviceName, params.appName);
+        const uploadResponse = await client.buildServiceOperations.getResourceUploadUrl(params.resourceGroupName, params.serviceName, buildServiceName);
         core.debug('request upload url response: ' +  JSON.stringify(uploadResponse));
         await uploadFileToSasUrl(uploadResponse.uploadUrl, fileToUpload);
-        const buildServiceName = "default";
         const build: asa.Build = {
             properties: {
                 relativePath: uploadResponse.relativePath,
-                builder: params.builder ? params.builder : `${resourceId}/buildServices/${buildServiceName}/builders/default`,
-                agentPool: `${resourceId}/buildServices/default/agentPools/default`,
+                builder: params.builder ? `${resourceId}/buildServices/${buildServiceName}/builders/${params.builder}` : `${resourceId}/buildServices/${buildServiceName}/builders/default`,
+                agentPool: `${resourceId}/buildServices/${buildServiceName}/agentPools/default`,
             }
         };
         if (params.buildEnv) {
@@ -126,9 +126,9 @@ export class DeploymentHelper {
             core.debug('Environment Variables: ' + JSON.stringify(parsedBuildEnvVariables));
             build.properties.env = parsedBuildEnvVariables;
         }
-        const buildResponse = await client.buildServiceOperations.createOrUpdateBuild(params.resourceGroupName, params.serviceName, "default", params.appName, build);
+        const buildResponse = await client.buildServiceOperations.createOrUpdateBuild(params.resourceGroupName, params.serviceName, buildServiceName, params.appName, build);
         core.debug('build response: ' +  JSON.stringify(buildResponse));
-        const waitResponse = await client.buildServiceOperations.getBuildResult(params.resourceGroupName, params.serviceName, "default", params.appName, buildResponse.properties.triggeredBuildResult.id);
+        const waitResponse = await client.buildServiceOperations.getBuildResult(params.resourceGroupName, params.serviceName, buildServiceName, params.appName, buildResponse.properties.triggeredBuildResult.id);
         core.debug('build result response: ' +  JSON.stringify(waitResponse));
         let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, buildResponse.properties.triggeredBuildResult.id);
         core.debug("deploymentResource: " + JSON.stringify(deploymentResource));
