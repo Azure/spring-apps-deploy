@@ -132,10 +132,10 @@ export class DeploymentHelper {
         const regex = RegExp("[^/]+$");
         const buildResultName = regex.exec(buildResponse.properties.triggeredBuildResult.id)[0];
         let buildProvisioningState = 'Queuing';
+        core.debug("wait for build result......");
         while (buildProvisioningState != 'Succeeded') {
-            await new Promise(() => setTimeout(() => {
-                console.log("wait for 5 seconds");
-            }, 5000));
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            console.log("wait for 5 seconds....");
             const waitResponse = await client.buildServiceOperations.getBuildResult(params.resourceGroupName, params.serviceName, buildServiceName, buildName, buildResultName);
             core.debug('build result response: ' + JSON.stringify(waitResponse));
             buildProvisioningState = waitResponse.properties.provisioningState;
