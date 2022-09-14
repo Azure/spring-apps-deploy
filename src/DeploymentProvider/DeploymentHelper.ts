@@ -133,9 +133,11 @@ export class DeploymentHelper {
         const buildResultName = regex.exec(buildResponse.properties.triggeredBuildResult.id)[0];
         let buildProvisioningState = 'Queuing';
         while (buildProvisioningState != 'Succeeded') {
-            setTimeout(() => {  console.log("wait for 5 seconds"); }, 5000);
+            await new Promise(() => setTimeout(() => {
+                console.log("wait for 5 seconds");
+            }, 5000));
             const waitResponse = await client.buildServiceOperations.getBuildResult(params.resourceGroupName, params.serviceName, buildServiceName, buildName, buildResultName);
-            core.debug('build result response: ' +  JSON.stringify(waitResponse));
+            core.debug('build result response: ' + JSON.stringify(waitResponse));
             buildProvisioningState = waitResponse.properties.provisioningState;
         }
         let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, buildResponse.properties.triggeredBuildResult.id);
