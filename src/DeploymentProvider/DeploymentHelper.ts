@@ -110,7 +110,7 @@ export class DeploymentHelper {
 
     public static async deployEnterprise(client: asa.AppPlatformManagementClient, params: ActionParameters, sourceType: string, fileToUpload: string, resourceId: string) {
         const buildServiceName = "default";
-        const buildName = `${params.appName}/${params.deploymentName}`;
+        const buildName = `${params.appName}-${params.deploymentName}`;
         core.debug('Starting deploy for enterprise');
         const uploadResponse = await client.buildServiceOperations.getResourceUploadUrl(params.resourceGroupName, params.serviceName, buildServiceName);
         core.debug('request upload url response: ' +  JSON.stringify(uploadResponse));
