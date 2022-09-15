@@ -3,7 +3,6 @@ import * as asa from '@azure/arm-appplatform'
 import { uploadFileToSasUrl } from "./azure-storage";
 import * as core from "@actions/core";
 import { parse } from 'azure-actions-utility/parameterParserUtility';
-import {UserSourceInfoUnion} from "@azure/arm-appplatform";
 
 export class DeploymentHelper {
 
@@ -218,7 +217,7 @@ export class DeploymentHelper {
             let deploymentSettings = {...getResponse.properties.deploymentSettings, ...deploymentSettingsPart};
             deploymentResource = {
                 properties: {
-                    source: source as UserSourceInfoUnion,
+                    source: source as asa.UserSourceInfoUnion,
                     deploymentSettings: deploymentSettings
                 },
                 sku: getResponse.sku
@@ -226,7 +225,7 @@ export class DeploymentHelper {
         } else {
             deploymentResource = {
                 properties: {
-                    source: sourcePart as UserSourceInfoUnion,
+                    source: sourcePart as asa.UserSourceInfoUnion,
                     deploymentSettings: deploymentSettingsPart
                 }
             };
