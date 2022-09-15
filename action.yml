@@ -55,7 +55,7 @@ inputs:
     description: '(Enterprise Tier Only) Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Default: 2Gi.'
     required: false
   build-env:
-    description: "Space-separated environment variables in 'key[=value]' format."
+    description: "(Enterprise Tier Only) Space-separated environment variables in 'key[=value]' format."
     required: false
   config-file-patterns:
     description: "(Enterprise Tier Only) Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '\"\"' to clear existing configurations."
