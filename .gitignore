@@ -13,6 +13,7 @@
 *.userprefs
 
 # Build results
+[Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
@@ -22,6 +23,7 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+[Ll]ib/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -260,6 +262,7 @@ FakesAssemblies/
 
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
+node_modules/
 
 # Visual Studio 6 build log
 *.plg
@@ -326,6 +329,3 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder
 .mfractor/
-
-# test
-__tests__/
