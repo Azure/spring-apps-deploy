@@ -122,11 +122,17 @@ export class DeploymentHelper {
                 agentPool: `${resourceId}/buildServices/${buildServiceName}/agentPools/default`,
             }
         };
+        let transformedBuildEnvironmentVariables = {};
         if (params.buildEnv) {
+            core.debug("Build environment variables modified.");
             const parsedBuildEnvVariables = parse(params.buildEnv);
-            core.debug('Environment Variables: ' + JSON.stringify(parsedBuildEnvVariables));
-            build.properties.env = parsedBuildEnvVariables;
+            //Parsed pairs come back as  {"key1":{"value":"val1"},"key2":{"value":"val2"}}
+            Object.keys(parsedBuildEnvVariables).forEach(key => {
+                transformedBuildEnvironmentVariables[key] = parsedBuildEnvVariables[key]['value'];
+            });
+            build.properties.env = transformedBuildEnvironmentVariables;
         }
+        core.debug('build: ' +  JSON.stringify(build));
         const buildResponse = await client.buildServiceOperations.createOrUpdateBuild(params.resourceGroupName, params.serviceName, buildServiceName, buildName, build);
         core.debug('build response: ' +  JSON.stringify(buildResponse));
         const regex = RegExp("[^/]+$");
