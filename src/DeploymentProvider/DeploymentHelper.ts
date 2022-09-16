@@ -3,6 +3,7 @@ import * as asa from '@azure/arm-appplatform'
 import { uploadFileToSasUrl } from "./azure-storage";
 import * as core from "@actions/core";
 import { parse } from 'azure-actions-utility/parameterParserUtility';
+import {SourceType} from "./AzureSpringAppsDeploymentProvider";
 
 export class DeploymentHelper {
 
@@ -172,10 +173,18 @@ export class DeploymentHelper {
         }
         let getResponse: asa.DeploymentResource = await this.getDeployment(client, params, getDeploymentName);
         let deploymentResource: asa.DeploymentResource;
-        let sourcePart = {};
-        sourcePart["type"] = sourceType;
-        const idOrPathKey = sourceType == "BuildResult" ? "buildResultId" : "relativePath";
-        sourcePart[idOrPathKey] = idOrPathKey;
+        let sourcePart: {};
+        if (sourceType == SourceType.BUILD_RESULT) {
+            sourcePart = {
+                buildResultId: idOrPath,
+                type: SourceType.BUILD_RESULT
+            }
+        } else {
+            sourcePart = {
+                relativePath: idOrPath,
+                type: sourceType,
+            }
+        }
         if(params.version) {
             sourcePart["version"] = params.version;
         }
