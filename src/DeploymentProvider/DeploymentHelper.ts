@@ -110,7 +110,6 @@ export class DeploymentHelper {
     public static async deployEnterprise(client: asa.AppPlatformManagementClient, params: ActionParameters, sourceType: string, fileToUpload: string, resourceId: string) {
         const buildServiceName = "default";
         const buildName = `${params.appName}-${params.deploymentName}`;
-        core.debug('Starting deploy for enterprise');
         const uploadResponse = await client.buildServiceOperations.getResourceUploadUrl(params.resourceGroupName, params.serviceName, buildServiceName);
         core.debug('request upload url response: ' +  JSON.stringify(uploadResponse));
         await uploadFileToSasUrl(uploadResponse.uploadUrl, fileToUpload);
@@ -150,7 +149,7 @@ export class DeploymentHelper {
         if (cnt == 180) {
             throw Error("Build result timeout.");
         }
-        if (buildProvisioningState == 'Failed') {
+        if (buildProvisioningState != 'Succeeded') {
             throw Error("Build result failed.");
         }
         let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, buildResponse.properties.triggeredBuildResult.id);
@@ -173,18 +172,10 @@ export class DeploymentHelper {
         }
         let getResponse: asa.DeploymentResource = await this.getDeployment(client, params, getDeploymentName);
         let deploymentResource: asa.DeploymentResource;
-        let sourcePart: {};
-        if (sourceType == "BuildResult") {
-            sourcePart = {
-                buildResultId: idOrPath,
-                type: "BuildResult"
-            }
-        } else {
-            sourcePart = {
-                relativePath: idOrPath,
-                type: sourceType,
-            }
-        }
+        let sourcePart = {};
+        sourcePart["type"] = sourceType;
+        const idOrPathKey = sourceType == "BuildResult" ? "buildResultId" : "relativePath";
+        sourcePart[idOrPathKey] = idOrPathKey;
         if(params.version) {
             sourcePart["version"] = params.version;
         }
