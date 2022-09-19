@@ -14,6 +14,8 @@ export class AzureSpringAppsDeploymentProvider {
     params: ActionParameters;
     client: asa.AppPlatformManagementClient;
     logDetail: string;
+    tier: string;
+    resourceId: string;
 
     constructor() {
         this.params = ActionParametersUtility.getParameters();
@@ -45,6 +47,8 @@ export class AzureSpringAppsDeploymentProvider {
         const serviceResponse = await this.client.services.get(this.params.resourceGroupName, this.params.serviceName);
         core.debug("service response: " + JSON.stringify(serviceResponse));
         this.logDetail = `service ${this.params.serviceName} app ${this.params.appName}`;
+        this.tier = serviceResponse.sku.tier;
+        this.resourceId = serviceResponse.id;
     }
 
     public async deployAppStep() {
@@ -155,8 +159,13 @@ export class AzureSpringAppsDeploymentProvider {
                 throw Error(`Production deployment does not exist in ${this.logDetail}.`);
             }
         }
-
-        await dh.deploy(this.client, this.params, sourceType, fileToUpload);
+        if (this.tier == "Standard" || this.tier == "Basic") {
+            await dh.deploy(this.client, this.params, sourceType, fileToUpload);
+        } else if (this.tier == "Enterprise") {
+            await dh.deployEnterprise(this.client, this.params, "BuildResult", fileToUpload, this.resourceId);
+        } else {
+            throw Error(`Service tier not recognizable in ${this.logDetail}.`);
+        }
         console.log(`Deploy action successful for ${this.logDetail} to deployment ${deploymentName}.`);
 
     }
@@ -203,5 +212,6 @@ export class AzureSpringAppsDeploymentProvider {
 export const SourceType = {
     JAR: "Jar",
     SOURCE_DIRECTORY: "Source",
-    DOT_NET_CORE_ZIP: "NetCoreZip"
+    DOT_NET_CORE_ZIP: "NetCoreZip",
+    BUILD_RESULT: "BuildResult"
 }
