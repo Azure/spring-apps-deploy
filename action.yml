@@ -45,6 +45,20 @@ inputs:
   version:
     description: 'The runtime on which the app will run.'
     required: false
+  builder:
+    description: '(Enterprise Tier Only) Build service builder used to build the executable.'
+    required: false
+  build-cpu:
+    description: '(Enterprise Tier Only) CPU resource quantity for build container. Should be 500m or number of CPU cores. Default: 1'
+    required: false
+  build-memory:
+    description: '(Enterprise Tier Only) Memory resource quantity for build container. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Default: 2Gi.'
+    required: false
+  build-env:
+    description: "(Enterprise Tier Only) Space-separated environment variables for the build process in 'key[=value]' format."
+    required: false
+  config-file-patterns:
+    description: "(Enterprise Tier Only) Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '\"\"' to clear existing configurations."
 branding:
   icon: 'icon.svg'
 runs:
