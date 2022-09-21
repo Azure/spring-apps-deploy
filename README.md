@@ -182,7 +182,7 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
 > [!NOTE]
 > Some arguments are only applicable for certain settings of the `action` argument. The Action column below specifies the pertinent actions for each argument. Any argument listed as Required is only required for the pertinent Action(s).
 
-|Argument|<div style="width:100px">Action</div>|Required| Description |
+|Argument|<div style="width:100px">Action</div>|Required|Description|
 |--- |--- |--- |--- |
 |`action`|all|Required| The action to be performed by this task.<br/>One of: `deploy`, `set-production`, `delete-staging-deployment`<br/>Default value: `deploy`|
 |`azure-subscription`|all|Required| The Azure subscription ID for the target Azure Spring Apps instance.|
@@ -202,6 +202,7 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
 |`build-memory`|deploy|Optional| (Enterprise Tier Only) Memory resource quantity for build container. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Default: 2Gi.|
 |`build-env`|deploy|Optional| (Enterprise Tier Only) Space-separated environment variables for the build process using the syntax '-key value'.<br/>Example: ```-CUSTOMER_NAME Contoso -WEBSITE_TIME_ZONE "Eastern Standard Time"```|
 |`config-file-patterns`|deploy|Optional| (Enterprise Tier Only) Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '""' to clear existing configurations.|
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
