@@ -187,7 +187,7 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
 |`action`|all|Required| The action to be performed by this task.<br/>One of: `deploy`, `set-production`, `delete-staging-deployment`<br/>Default value: `deploy`|
 |`azure-subscription`|all|Required| The Azure subscription ID for the target Azure Spring Apps instance.|
 |`service-name`|all|Required| The name of the Azure Spring Apps service instance.|
-|`app-name`|all|Required| The name of the Azure Spring Apps app to deploy. The app must exist prior to task execution.
+|`app-name`|all|Required| The name of the Azure Spring Apps app to deploy. The app must exist prior to task execution.|
 |`use-staging-deployment`|deploy<br/>set-production|Optional| If set to `true`, apply the task to whichever deployment is set as the staging deployment at time of execution. If set to `false`, apply the task to the production deployment.<br/>Default value: `true`|
 |`deployment-name`|deploy<br/>set-production|Optional| The name of the deployment to which the action will apply. It overrides the setting of `use-staging-deployment`.|
 |`create-new-deployment`|deploy|Optional| If set to `true` and the deployment specified by `deployment-name` does not exist at execution time, it will be created.<br/>Default value: `false`|
@@ -197,6 +197,11 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
 |`jvm-options`|deploy|Optional| A string containing JVM Options. <br/> Example: `-Dspring.profiles.active=mysql`|
 |`dotnetcore-mainentry-path`|deploy|Optional| A string containing the path to the .NET executable relative to zip root.|
 |`version`|deploy|Optional| The deployment version. If not set, the version is left unchanged.|
+|`builder`|deploy|Optional| (Enterprise Tier Only) Build service builder used to build the executable.|
+|`build-cpu`|deploy|Optional| (Enterprise Tier Only) CPU resource quantity for build container. Should be 500m or number of CPU cores. Default: 1|
+|`build-memory`|deploy|Optional| (Enterprise Tier Only) Memory resource quantity for build container. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Default: 2Gi.|
+|`build-env`|deploy|Optional| (Enterprise Tier Only) Space-separated environment variables for the build process using the syntax '-key value'.<br/>Example: ```-CUSTOMER_NAME Contoso -WEBSITE_TIME_ZONE "Eastern Standard Time"```|
+|`config-file-patterns`|deploy|Optional| (Enterprise Tier Only) Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '""' to clear existing configurations.|
 
 ## Contributing
 

@@ -29,7 +29,7 @@
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.0",
-    "@azure/arm-appplatform": "^2.0.0",
+    "@azure/arm-appplatform": "^2.1.0-beta.1",
     "@azure/identity": "^2.1.0",
     "@azure/storage-file-share": "^12.8.0",
     "azure-actions-utility": "^1.0.3",
