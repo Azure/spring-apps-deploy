@@ -121,6 +121,12 @@ export class DeploymentHelper {
                 agentPool: `${resourceId}/buildServices/${buildServiceName}/agentPools/default`,
             }
         };
+        if (params.buildCpu) {
+            build.properties.resourceRequests.cpu = params.buildCpu;
+        }
+        if (params.buildMemory) {
+            build.properties.resourceRequests.memory = params.buildMemory;
+        }
         let transformedBuildEnvironmentVariables = {};
         if (params.buildEnv) {
             core.debug("Build environment variables modified.");
