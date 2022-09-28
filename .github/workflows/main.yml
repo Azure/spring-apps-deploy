@@ -1,0 +1,121 @@
+on: [workflow_dispatch]
+env:
+  ASC_PACKAGE_PATH: ${{ github.workspace }}
+  JAR_PATH: target/hello-world.jar
+  VAR1: Eastern Standard Time
+
+jobs:
+  Standard_tier_deploy_job:
+    runs-on: ubuntu-latest
+    name: Standard tier deploy
+    steps:
+      - name: Checkout Github Action
+        uses: actions/checkout@master
+
+      - name: Login via Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_SUBSCRIPTION_SP }}
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%m%d')"
+
+      - name: Create Staging Deploy
+        uses: Azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+          action: deploy
+          service-name: "github-action-standard-${{ steps.date.outputs.date }}"
+          app-name: hello
+          create-new-deployment: true
+          use-staging-deployment: true
+          package: ${{ github.workspace }}/${{ env.JAR_PATH }}
+          jvm-options: -Xms512m -Xmx512m
+          environment-variables: "-CUSTOMER_NAME Contoso \
+          -WEBSITE_TIME_ZONE \"${{ env.VAR1 }}\""
+
+      - name: Deploy to production (source)
+        uses: Azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+          action: deploy
+          service-name: "github-action-standard-${{ steps.date.outputs.date }}"
+          app-name: hello
+          use-staging-deployment: false
+          package: ${{ github.workspace }}/source-app
+
+      - name: Set production
+        uses: Azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+          action: set-production
+          service-name: "github-action-standard-${{ steps.date.outputs.date }}"
+          app-name: hello
+          use-staging-deployment: true
+
+      - name: Delete staging deployment
+        uses: Azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+          action: delete-staging-deployment
+          service-name: "github-action-standard-${{ steps.date.outputs.date }}"
+          app-name: hello
+          use-staging-deployment: true
+
+  Enterprise_tier_deploy_job:
+    runs-on: ubuntu-latest
+    name: Enterprise tier deploy
+    steps:
+      - name: Checkout Github Action
+        uses: actions/checkout@master
+
+      - name: Login via Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.DEV_SUB }}
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%m%d')"
+
+      - name: Create Staging Deploy
+        uses: Azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+          action: deploy
+          service-name: "github-action-enterprise-${{ steps.date.outputs.date }}"
+          app-name: hello
+          create-new-deployment: true
+          use-staging-deployment: true
+          package: ${{ github.workspace }}/${{ env.JAR_PATH }}
+          builder: default
+
+      - name: Deploy to production (source)
+        uses: Azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+          action: deploy
+          service-name: "github-action-enterprise-${{ steps.date.outputs.date }}"
+          app-name: hello
+          use-staging-deployment: false
+          package: ${{ github.workspace }}/source-app
+          builder: default
+
+      - name: Set production
+        uses: Azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+          action: set-production
+          service-name: "github-action-enterprise-${{ steps.date.outputs.date }}"
+          app-name: hello
+          use-staging-deployment: true
+
+      - name: Delete staging deployment
+        uses: Azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ secrets.AZURE_SUBSCRIPTION }}
+          action: delete-staging-deployment
+          service-name: "github-action-enterprise-${{ steps.date.outputs.date }}"
+          app-name: hello
+          use-staging-deployment: true
