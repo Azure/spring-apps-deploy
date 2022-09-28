@@ -1,7 +1,7 @@
 on: [workflow_dispatch]
 env:
   ASC_PACKAGE_PATH: ${{ github.workspace }}
-  JAR_PATH: target/hello-world.jar
+  JAR_PATH: test_apps/target/hello-world.jar
   VAR1: Eastern Standard Time
 
 jobs:
@@ -43,7 +43,7 @@ jobs:
           service-name: "github-action-standard-${{ steps.date.outputs.date }}"
           app-name: hello
           use-staging-deployment: false
-          package: ${{ github.workspace }}/source-app
+          package: ${{ github.workspace }}/test_apps/source-app
 
       - name: Set production
         uses: Azure/spring-apps-deploy@v1
@@ -99,7 +99,7 @@ jobs:
           service-name: "github-action-enterprise-${{ steps.date.outputs.date }}"
           app-name: hello
           use-staging-deployment: false
-          package: ${{ github.workspace }}/source-app
+          package: ${{ github.workspace }}/test_apps/source-app
           builder: default
 
       - name: Set production
