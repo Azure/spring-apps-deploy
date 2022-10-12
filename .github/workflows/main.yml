@@ -73,7 +73,7 @@ jobs:
       - name: Login via Azure CLI
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.DEV_SUB }}
+          creds: ${{ secrets.AZURE_SUBSCRIPTION_SP }}
 
       - name: Get current date
         id: date
