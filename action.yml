@@ -59,6 +59,31 @@ inputs:
     required: false
   config-file-patterns:
     description: "(Enterprise Tier Only) Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '\"\"' to clear existing configurations."
+    required: false
+  registry-server:
+    description: "The registry of the container image.  Default: docker.io."
+    required: false
+    default: "docker.io"
+  registry-username:
+    description: "The username of the container registry."
+    required: false
+  registry-password:
+    description: "The password of the container registry."
+    required: false
+  image-name:
+    description: "The container image tag."
+    required: false
+  image-command:
+    description: "The command of the container image."
+    required: false
+  image-args:
+    description: "The arguments of the container image."
+    required: false
+  image-language-framework:
+    description: "The language framework of the container image."
+    required: false
+
+
 branding:
   icon: 'icon.svg'
 runs:

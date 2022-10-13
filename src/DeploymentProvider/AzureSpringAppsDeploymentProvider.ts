@@ -159,7 +159,10 @@ export class AzureSpringAppsDeploymentProvider {
                 throw Error(`Production deployment does not exist in ${this.logDetail}.`);
             }
         }
-        if (this.tier == "Standard" || this.tier == "Basic") {
+        if (sourceType == SourceType.CUSTOM_CONTAINER) {
+            await dh.deployCustomContainer(this.client, this.params, sourceType);
+        }
+        else if (this.tier == "Standard" || this.tier == "Basic") {
             await dh.deploy(this.client, this.params, sourceType, fileToUpload);
         } else if (this.tier == "Enterprise") {
             await dh.deployEnterprise(this.client, this.params, "BuildResult", fileToUpload, this.resourceId);
@@ -191,6 +194,9 @@ export class AzureSpringAppsDeploymentProvider {
     }
 
     private determineSourceType(pkg: Package): string {
+        if (this.params.imageName && this.params.registryServer) {
+            return SourceType.CUSTOM_CONTAINER;
+        }
         var sourceType: string;
         switch (pkg.getPackageType()) {
             case PackageType.folder:
@@ -213,5 +219,6 @@ export const SourceType = {
     JAR: "Jar",
     SOURCE_DIRECTORY: "Source",
     DOT_NET_CORE_ZIP: "NetCoreZip",
-    BUILD_RESULT: "BuildResult"
+    BUILD_RESULT: "BuildResult",
+    CUSTOM_CONTAINER: "Container"
 }

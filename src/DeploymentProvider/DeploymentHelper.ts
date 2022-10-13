@@ -108,6 +108,14 @@ export class DeploymentHelper {
         return;
     }
 
+    public static async deployCustomContainer(client: asa.AppPlatformManagementClient, params: ActionParameters, sourceType: string) {
+        let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, null);
+        core.debug("custom container deploymentResource: " + JSON.stringify(deploymentResource));
+        const response = await client.deployments.beginCreateOrUpdateAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
+        core.debug('custom container deploy response: ' + JSON.stringify(response));
+        return;
+    }
+
     public static async deployEnterprise(client: asa.AppPlatformManagementClient, params: ActionParameters, sourceType: string, fileToUpload: string, resourceId: string) {
         const buildServiceName = "default";
         const buildName = `${params.appName}-${params.deploymentName}`;
@@ -180,7 +188,33 @@ export class DeploymentHelper {
         let getResponse: asa.DeploymentResource = await this.getDeployment(client, params, getDeploymentName);
         let deploymentResource: asa.DeploymentResource;
         let sourcePart: {};
-        if (sourceType == SourceType.BUILD_RESULT) {
+        if (sourceType == SourceType.CUSTOM_CONTAINER) {
+            sourcePart = {
+                type: SourceType.CUSTOM_CONTAINER
+            }
+            if (params.registryServer) {
+                sourcePart["customContainer"]["server"] = params.registryServer;
+            }
+            if (params.registryUsername) {
+                sourcePart["customContainer"]["imageRegistryCredential"]["username"] = params.registryUsername;
+            }
+            if (params.registryPassword) {
+                sourcePart["customContainer"]["imageRegistryCredential"]["password"] = params.registryPassword;
+            }
+            if (params.imageName) {
+                sourcePart["customContainer"]["containerImage"] = params.imageName;
+            }
+            if (params.imageCommand) {
+                sourcePart["customContainer"]["command"] = params.imageCommand;
+            }
+            if (params.imageArgs) {
+                sourcePart["customContainer"]["args"] = params.imageArgs;
+            }
+            if (params.imageLanguageFramework) {
+                sourcePart["customContainer"]["languageFramework"] = params.imageLanguageFramework;
+            }
+        }
+        else if (sourceType == SourceType.BUILD_RESULT) {
             sourcePart = {
                 buildResultId: idOrPath,
                 type: SourceType.BUILD_RESULT
