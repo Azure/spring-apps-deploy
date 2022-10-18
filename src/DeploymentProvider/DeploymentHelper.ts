@@ -192,27 +192,32 @@ export class DeploymentHelper {
             sourcePart = {
                 type: SourceType.CUSTOM_CONTAINER
             }
+            let customContainer: asa.CustomContainer = {};
+            let imageRegistryCredential: asa.ImageRegistryCredential = {};
             if (params.registryServer) {
-                sourcePart["customContainer"]["server"] = params.registryServer;
+                customContainer.server = params.registryServer;
             }
-            if (params.registryUsername) {
-                sourcePart["customContainer"]["imageRegistryCredential"]["username"] = params.registryUsername;
+            if (params.registryUsername || params.registryPassword) {
+                imageRegistryCredential.username = params.registryUsername;
+                imageRegistryCredential.password = params.registryPassword;
+                customContainer.imageRegistryCredential = imageRegistryCredential;
             }
             if (params.registryPassword) {
-                sourcePart["customContainer"]["imageRegistryCredential"]["password"] = params.registryPassword;
+                customContainer.imageRegistryCredential.password = params.registryPassword;
             }
             if (params.imageName) {
-                sourcePart["customContainer"]["containerImage"] = params.imageName;
+                customContainer.containerImage = params.imageName;
             }
             if (params.imageCommand) {
-                sourcePart["customContainer"]["command"] = params.imageCommand;
+                customContainer.command = params.imageCommand.split(' ');
             }
             if (params.imageArgs) {
-                sourcePart["customContainer"]["args"] = params.imageArgs;
+                customContainer.args = params.imageArgs.split(' ');
             }
             if (params.imageLanguageFramework) {
-                sourcePart["customContainer"]["languageFramework"] = params.imageLanguageFramework;
+                customContainer.languageFramework = params.imageLanguageFramework;
             }
+            sourcePart["customContainer"] = customContainer;
         }
         else if (sourceType == SourceType.BUILD_RESULT) {
             sourcePart = {
@@ -239,7 +244,11 @@ export class DeploymentHelper {
             sourcePart["runtimeVersion"] = params.runtimeVersion;
         }
         if (params.configFilePatterns) {
-            deploymentSettingsPart["addonConfigs"]["applicationConfigurationService"]["configFilePatterns"] = params.configFilePatterns;
+            deploymentSettingsPart["addonConfigs"] = {
+                applicationConfigurationService: {
+                    configFilePatterns: params.configFilePatterns
+                }
+            }
         }
         let transformedEnvironmentVariables = {};
         if (params.environmentVariables) {
