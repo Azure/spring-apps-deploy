@@ -202,6 +202,13 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
 |`build-memory`|deploy|Optional| (Enterprise Tier Only) Memory resource quantity for build container. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Default: 2Gi.|
 |`build-env`|deploy|Optional| (Enterprise Tier Only) Space-separated environment variables for the build process using the syntax '-key value'.<br/>Example: ```-CUSTOMER_NAME Contoso -WEBSITE_TIME_ZONE "Eastern Standard Time"```|
 |`config-file-patterns`|deploy|Optional| (Enterprise Tier Only) Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '""' to clear existing configurations.|
+|`registry-server`|deploy|Optional| The registry of the container image.  <br/>Default value: `docker.io`|
+|`registry-username`|deploy|Optional| The username of the container registry.|
+|`registry-password`|deploy|Optional| The password of the container registry.|
+|`image-name`|deploy|Optional| The container image tag.|
+|`image-command`|deploy|Optional| The command of the container image.|
+|`image-args`|deploy|Optional| The arguments of the container image.|
+|`image-language-framework`|deploy|Optional| The language framework of the container image.|
 
 ## Contributing
 
