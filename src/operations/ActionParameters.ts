@@ -21,6 +21,13 @@ export class Inputs {
     public static readonly BUILD_MEMORY = 'build-memory';
     public static readonly BUILD_ENV = 'build-env';
     public static readonly CONFIG_FILE_PATTERNS = 'config-file-patterns';
+    public static readonly REGISTRY_SERVER = 'registry-server';
+    public static readonly REGISTRY_USERNAME = 'registry-username';
+    public static readonly REGISTRY_PASSWORD = 'registry-password';
+    public static readonly IMAGE_NAME = 'image-name';
+    public static readonly IMAGE_COMMAND = 'image-command';
+    public static readonly IMAGE_ARGS = 'image-args';
+    public static readonly IMAGE_LANGUAGE_FRAMEWORK = 'image-language-framework';
 }
 
 export class Actions {
@@ -49,7 +56,14 @@ export class ActionParametersUtility {
             buildCpu: core.getInput(Inputs.BUILD_CPU, {"required": false}),
             buildMemory: core.getInput(Inputs.BUILD_MEMORY, {"required": false}),
             buildEnv: core.getInput(Inputs.BUILD_ENV, {"required": false}),
-            configFilePatterns: core.getInput(Inputs.CONFIG_FILE_PATTERNS, {"required": false})
+            configFilePatterns: core.getInput(Inputs.CONFIG_FILE_PATTERNS, {"required": false}),
+            registryServer: core.getInput(Inputs.REGISTRY_SERVER, {"required": false}),
+            registryUsername: core.getInput(Inputs.REGISTRY_USERNAME, {"required": false}),
+            registryPassword: core.getInput(Inputs.REGISTRY_PASSWORD, {"required": false}),
+            imageName: core.getInput(Inputs.IMAGE_NAME, {"required": false}),
+            imageCommand: core.getInput(Inputs.IMAGE_COMMAND, {"required": false}),
+            imageArgs: core.getInput(Inputs.IMAGE_ARGS, {"required": false}),
+            imageLanguageFramework: core.getInput(Inputs.IMAGE_LANGUAGE_FRAMEWORK, {"required": false})
         }
 
         //Do not attempt to parse package in non-deployment steps. This causes variable substitution errors.
@@ -83,4 +97,11 @@ export interface ActionParameters {
     buildMemory?: string;
     buildEnv?: string;
     configFilePatterns?: string;
+    registryServer?: string;
+    registryUsername?: string;
+    registryPassword?: string;
+    imageName?: string;
+    imageCommand?: string;
+    imageArgs?: string;
+    imageLanguageFramework?: string;
 }
