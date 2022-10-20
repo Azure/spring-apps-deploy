@@ -108,6 +108,14 @@ export class DeploymentHelper {
         return;
     }
 
+    public static async deployCustomContainer(client: asa.AppPlatformManagementClient, params: ActionParameters, sourceType: string) {
+        let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, null);
+        core.debug("custom container deploymentResource: " + JSON.stringify(deploymentResource));
+        const response = await client.deployments.beginCreateOrUpdateAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
+        core.debug('custom container deploy response: ' + JSON.stringify(response));
+        return;
+    }
+
     public static async deployEnterprise(client: asa.AppPlatformManagementClient, params: ActionParameters, sourceType: string, fileToUpload: string, resourceId: string) {
         const buildServiceName = "default";
         const buildName = `${params.appName}-${params.deploymentName}`;
@@ -180,7 +188,35 @@ export class DeploymentHelper {
         let getResponse: asa.DeploymentResource = await this.getDeployment(client, params, getDeploymentName);
         let deploymentResource: asa.DeploymentResource;
         let sourcePart: {};
-        if (sourceType == SourceType.BUILD_RESULT) {
+        if (sourceType == SourceType.CUSTOM_CONTAINER) {
+            sourcePart = {
+                type: SourceType.CUSTOM_CONTAINER
+            }
+            let customContainer: asa.CustomContainer = {};
+            let imageRegistryCredential: asa.ImageRegistryCredential = {};
+            if (params.registryServer) {
+                customContainer.server = params.registryServer;
+            }
+            if (params.registryUsername || params.registryPassword) {
+                imageRegistryCredential.username = params.registryUsername;
+                imageRegistryCredential.password = params.registryPassword;
+                customContainer.imageRegistryCredential = imageRegistryCredential;
+            }
+            if (params.imageName) {
+                customContainer.containerImage = params.imageName;
+            }
+            if (params.imageCommand) {
+                customContainer.command = params.imageCommand.split(' ');
+            }
+            if (params.imageArgs) {
+                customContainer.args = params.imageArgs.split(' ');
+            }
+            if (params.imageLanguageFramework) {
+                customContainer.languageFramework = params.imageLanguageFramework;
+            }
+            sourcePart["customContainer"] = customContainer;
+        }
+        else if (sourceType == SourceType.BUILD_RESULT) {
             sourcePart = {
                 buildResultId: idOrPath,
                 type: SourceType.BUILD_RESULT
@@ -205,7 +241,11 @@ export class DeploymentHelper {
             sourcePart["runtimeVersion"] = params.runtimeVersion;
         }
         if (params.configFilePatterns) {
-            deploymentSettingsPart["addonConfigs"]["applicationConfigurationService"]["configFilePatterns"] = params.configFilePatterns;
+            deploymentSettingsPart["addonConfigs"] = {
+                applicationConfigurationService: {
+                    configFilePatterns: params.configFilePatterns
+                }
+            }
         }
         let transformedEnvironmentVariables = {};
         if (params.environmentVariables) {
