@@ -202,9 +202,6 @@ export class DeploymentHelper {
                 imageRegistryCredential.password = params.registryPassword;
                 customContainer.imageRegistryCredential = imageRegistryCredential;
             }
-            if (params.registryPassword) {
-                customContainer.imageRegistryCredential.password = params.registryPassword;
-            }
             if (params.imageName) {
                 customContainer.containerImage = params.imageName;
             }
