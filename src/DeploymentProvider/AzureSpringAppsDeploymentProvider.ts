@@ -194,7 +194,7 @@ export class AzureSpringAppsDeploymentProvider {
     }
 
     private determineSourceType(pkg: Package): string {
-        if (this.params.imageName && this.params.registryServer) {
+        if (this.params.containerImage && this.params.registryServer) {
             return SourceType.CUSTOM_CONTAINER;
         }
         var sourceType: string;

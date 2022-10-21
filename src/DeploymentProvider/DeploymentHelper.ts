@@ -202,17 +202,17 @@ export class DeploymentHelper {
                 imageRegistryCredential.password = params.registryPassword;
                 customContainer.imageRegistryCredential = imageRegistryCredential;
             }
-            if (params.imageName) {
-                customContainer.containerImage = params.imageName;
+            if (params.containerImage) {
+                customContainer.containerImage = params.containerImage;
             }
-            if (params.imageCommand) {
-                customContainer.command = params.imageCommand.split(' ');
+            if (params.containerCommand) {
+                customContainer.command = params.containerCommand.split(' ');
             }
-            if (params.imageArgs) {
-                customContainer.args = params.imageArgs.split(' ');
+            if (params.containerArgs) {
+                customContainer.args = params.containerArgs.split(' ');
             }
-            if (params.imageLanguageFramework) {
-                customContainer.languageFramework = params.imageLanguageFramework;
+            if (params.containerLanguageFramework) {
+                customContainer.languageFramework = params.containerLanguageFramework;
             }
             sourcePart["customContainer"] = customContainer;
         }

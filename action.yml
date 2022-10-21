@@ -70,16 +70,16 @@ inputs:
   registry-password:
     description: "The password of the container registry."
     required: false
-  image-name:
+  container-image:
     description: "The container image tag."
     required: false
-  image-command:
+  container-command:
     description: "The command of the container image."
     required: false
-  image-args:
+  container-args:
     description: "The arguments of the container image."
     required: false
-  image-language-framework:
+  container-language-framework:
     description: "The language framework of the container image."
     required: false
 
