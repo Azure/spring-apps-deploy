@@ -60,7 +60,7 @@ inputs:
   config-file-patterns:
     description: "(Enterprise Tier Only) Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '\"\"' to clear existing configurations."
     required: false
-  registry-server:
+  container-registry:
     description: "The registry of the container image.  Default: docker.io."
     required: false
     default: "docker.io"

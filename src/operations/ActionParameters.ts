@@ -21,7 +21,7 @@ export class Inputs {
     public static readonly BUILD_MEMORY = 'build-memory';
     public static readonly BUILD_ENV = 'build-env';
     public static readonly CONFIG_FILE_PATTERNS = 'config-file-patterns';
-    public static readonly REGISTRY_SERVER = 'registry-server';
+    public static readonly CONTAINER_REGISTRY = 'container-registry';
     public static readonly REGISTRY_USERNAME = 'registry-username';
     public static readonly REGISTRY_PASSWORD = 'registry-password';
     public static readonly CONTAINER_IMAGE = 'container-image';
@@ -57,7 +57,7 @@ export class ActionParametersUtility {
             buildMemory: core.getInput(Inputs.BUILD_MEMORY, {"required": false}),
             buildEnv: core.getInput(Inputs.BUILD_ENV, {"required": false}),
             configFilePatterns: core.getInput(Inputs.CONFIG_FILE_PATTERNS, {"required": false}),
-            registryServer: core.getInput(Inputs.REGISTRY_SERVER, {"required": false}),
+            containerRegistry: core.getInput(Inputs.CONTAINER_REGISTRY, {"required": false}),
             registryUsername: core.getInput(Inputs.REGISTRY_USERNAME, {"required": false}),
             registryPassword: core.getInput(Inputs.REGISTRY_PASSWORD, {"required": false}),
             containerImage: core.getInput(Inputs.CONTAINER_IMAGE, {"required": false}),
@@ -97,7 +97,7 @@ export interface ActionParameters {
     buildMemory?: string;
     buildEnv?: string;
     configFilePatterns?: string;
-    registryServer?: string;
+    containerRegistry?: string;
     registryUsername?: string;
     registryPassword?: string;
     containerImage?: string;

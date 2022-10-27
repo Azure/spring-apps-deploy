@@ -159,7 +159,7 @@ To deploy directly from a existing container image, use the following template.
           service-name: <service instance name>
           app-name: <app name>
           deployment-name: <deployment name>
-          registry-server: <registry server>
+          container-registry: <container registry>
           registry-username: <registry username>
           registry-password: <registry password>
           container-image: <container image>
@@ -221,7 +221,7 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
 |`build-memory`|deploy|Optional| (Enterprise Tier Only) Memory resource quantity for build container. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Default: 2Gi.|
 |`build-env`|deploy|Optional| (Enterprise Tier Only) Space-separated environment variables for the build process using the syntax '-key value'.<br/>Example: ```-CUSTOMER_NAME Contoso -WEBSITE_TIME_ZONE "Eastern Standard Time"```|
 |`config-file-patterns`|deploy|Optional| (Enterprise Tier Only) Config file patterns separated with ',' to decide which patterns of Application Configuration Service will be used. Use '""' to clear existing configurations.|
-|`registry-server`|deploy|Optional| The registry of the container image.  <br/>Default value: `docker.io`|
+|`container-registry`|deploy|Optional| The registry of the container image.  <br/>Default value: `docker.io`|
 |`registry-username`|deploy|Optional| The username of the container registry.|
 |`registry-password`|deploy|Optional| The password of the container registry.|
 |`container-image `|deploy|Optional| The container image.|

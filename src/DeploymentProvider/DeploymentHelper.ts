@@ -194,8 +194,8 @@ export class DeploymentHelper {
             }
             let customContainer: asa.CustomContainer = {};
             let imageRegistryCredential: asa.ImageRegistryCredential = {};
-            if (params.registryServer) {
-                customContainer.server = params.registryServer;
+            if (params.containerRegistry) {
+                customContainer.server = params.containerRegistry;
             }
             if (params.registryUsername || params.registryPassword) {
                 imageRegistryCredential.username = params.registryUsername;
