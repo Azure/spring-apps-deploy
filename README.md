@@ -205,7 +205,7 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
 |`registry-server`|deploy|Optional| The registry of the container image.  <br/>Default value: `docker.io`|
 |`registry-username`|deploy|Optional| The username of the container registry.|
 |`registry-password`|deploy|Optional| The password of the container registry.|
-|`container-image `|deploy|Optional| The container image tag.|
+|`container-image `|deploy|Optional| The container image.|
 |`container-command`|deploy|Optional| The command of the container.|
 |`container-args`|deploy|Optional| The arguments of the container.|
 |`language-framework`|deploy|Optional| The language framework of the container.|

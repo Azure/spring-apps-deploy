@@ -71,7 +71,7 @@ inputs:
     description: "The password of the container registry."
     required: false
   container-image:
-    description: "The container image tag."
+    description: "The container image."
     required: false
   container-command:
     description: "The command of the container."
