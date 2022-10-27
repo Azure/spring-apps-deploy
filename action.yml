@@ -74,13 +74,13 @@ inputs:
     description: "The container image tag."
     required: false
   container-command:
-    description: "The command of the container image."
+    description: "The command of the container."
     required: false
   container-args:
-    description: "The arguments of the container image."
+    description: "The arguments of the container."
     required: false
-  container-language-framework:
-    description: "The language framework of the container image."
+  language-framework:
+    description: "The language framework of the container."
     required: false
 
 

@@ -211,8 +211,8 @@ export class DeploymentHelper {
             if (params.containerArgs) {
                 customContainer.args = params.containerArgs.split(' ');
             }
-            if (params.containerLanguageFramework) {
-                customContainer.languageFramework = params.containerLanguageFramework;
+            if (params.languageFramework) {
+                customContainer.languageFramework = params.languageFramework;
             }
             sourcePart["customContainer"] = customContainer;
         }
