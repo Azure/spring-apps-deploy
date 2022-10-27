@@ -146,6 +146,25 @@ The following examples deploy to an existing staging deployment. This deployment
 
 For more information on blue-green deployments, including an alternative approach, see [Blue-green deployment strategies](https://docs.microsoft.com/en-us/azure/spring-apps/concepts-blue-green-deployment-strategies).
 
+#### Custom container image support
+To deploy directly from a existing container image, use the following template.
+```yml
+# environment preparation configurations omitted
+    steps:
+      - name: Deploy custom container image
+        uses: Azure/spring-apps-deploy@v1
+        with:
+          azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
+          action: deploy
+          service-name: <service instance name>
+          app-name: <app name>
+          deployment-name: <deployment name>
+          registry-server: <registry server>
+          registry-username: <registry username>
+          registry-password: <registry password>
+          container-image: <container image>
+```
+
 ### Setting production deployment
 
 The following example will set the current staging deployment as production, effectively swapping which deployment will receive production traffic.
