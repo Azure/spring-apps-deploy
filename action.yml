@@ -30,6 +30,14 @@ inputs:
     description: "File path to the package or a folder containing the Spring Apps app contents."
     required: false
     default: '${{ github.workspace }}/**/*.jar'
+  cpu:
+    description: "CPU resource quantity. Should be 500m or number of CPU cores. Only effective when creating new deployment."
+    required: false
+    default: '1'
+  memory:
+    description: "Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Only effective when creating new deployment."
+    required: false
+    default: '1Gi'      
   environment-variables:
     description: "Edit the app's environment variables."
     required: false
