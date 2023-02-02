@@ -234,7 +234,7 @@ export class DeploymentHelper {
             sourcePart["version"] = params.version;
         }
         let deploymentSettingsPart = {};
-        let resourceRequests: asa.ResourceRequests;
+        let resourceRequests: asa.ResourceRequests = {};
         if (params.action == Actions.DEPLOY && params.createNewDeployment) {
             resourceRequests.cpu = params.cpu;
             resourceRequests.memory = params.memory;
