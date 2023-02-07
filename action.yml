@@ -31,11 +31,11 @@ inputs:
     required: false
     default: '${{ github.workspace }}/**/*.jar'
   cpu:
-    description: "CPU resource quantity. Should be 500m or number of CPU cores. Only effective when creating new deployment."
+    description: "The CPU resource quantity. It should be 500m or number of CPU cores. It is effective only when creating new deployment."
     required: false
     default: '1'
   memory:
-    description: "Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Only effective when creating new deployment."
+    description: "The memory resource quantity. It should be 512Mi or #Gi, e.g., 1Gi, 3Gi. It is effective only when creating new deployment."
     required: false
     default: '1Gi'      
   environment-variables:

@@ -231,8 +231,8 @@ The "Delete Staging Deployment" action allows you to delete the deployment not r
 |`deployment-name`|deploy<br/>set-production|Optional| The name of the deployment to which the action will apply. It overrides the setting of `use-staging-deployment`.|
 |`create-new-deployment`|deploy|Optional| If set to `true` and the deployment specified by `deployment-name` does not exist at execution time, it will be created.<br/>Default value: `false`|
 |`package`|deploy|Required| The file path to the package containing the application to be deployed (`.jar` file for Java, `.zip` for .NET Core) or to a folder containing the application source to be built. <br/>Default value: ```${{ github.workspace }}/**/*.jar```|
-|`cpu`|deploy|Optional| CPU resource quantity. Should be 500m or number of CPU cores. CPU is only supported when creating new deployment <br/> Default value: 1|
-|`memory`|deploy|Optional| Memory resource quantity. Should be 512Mi or #Gi, e.g., 1Gi, 3Gi. Memory is only supported when creating new deployment <br/> Default value: 1Gi|
+|`cpu`|deploy|Optional| The CPU resource quantity. It should be 500m or number of CPU cores. It is effective only when creating new deployment. <br/> Default value: 1|
+|`memory`|deploy|Optional| The memory resource quantity. It should be 512Mi or #Gi, e.g., 1Gi, 3Gi. It is effective only when creating new deployment. <br/> Default value: 1Gi|
 |`runtime-version`|deploy|Optional| The runtime stack for the application.<br/>One of: `Java_8`, `Java_11`, `NetCore_31`,<br/>Default value: `Java_11`|
 |`environment-variables`|deploy|Optional| Environment variables to be entered using the syntax &#39;-key value&#39;. Values containing spaces should be enclosed in double quotes. <br/>Example: ```-CUSTOMER_NAME Contoso -WEBSITE_TIME_ZONE "Eastern Standard Time"```|
 |`jvm-options`|deploy|Optional| A string containing JVM Options. <br/> Example: `-Dspring.profiles.active=mysql`|
