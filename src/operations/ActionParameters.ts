@@ -16,6 +16,8 @@ export class Inputs {
     public static readonly DOTNETCORE_MAINENTRY_PATH = 'dotnetcore-mainentry-path';
     public static readonly VERSION = 'version';
     public static readonly PACKAGE = 'package';
+    public static readonly CPU = 'cpu';
+    public static readonly MEMORY = 'memory';
     public static readonly BUILDER = 'builder';
     public static readonly BUILD_CPU = 'build-cpu';
     public static readonly BUILD_MEMORY = 'build-memory';
@@ -47,6 +49,8 @@ export class ActionParametersUtility {
             useStagingDeployment: core.getInput(Inputs.USE_STAGING_DEPLOYMENT, {"required": true}).toLowerCase() == "true",
             createNewDeployment: core.getInput(Inputs.CREATE_NEW_DEPLOYMENT, {"required": false}).toLowerCase() == "true",
             deploymentName: core.getInput(Inputs.DEPLOYMENT_NAME, {"required": false}),
+            cpu: core.getInput(Inputs.CPU, {"required": false}),
+            memory: core.getInput(Inputs.MEMORY, {"required": false}),
             environmentVariables: core.getInput(Inputs.ENVIRONMENT_VARIABLES, {"required": false}),
             jvmOptions: core.getInput(Inputs.JVM_OPTIONS, {"required": false}),
             runtimeVersion: core.getInput(Inputs.RUNTIME_VERSION, {"required": false}),
@@ -68,7 +72,7 @@ export class ActionParametersUtility {
 
         //Do not attempt to parse package in non-deployment steps. This causes variable substitution errors.
         if (taskParameters.action == Actions.DEPLOY) {
-            taskParameters.Package = new Package(core.getInput(Inputs.PACKAGE, {"required": true}));
+            taskParameters.package = new Package(core.getInput(Inputs.PACKAGE, {"required": true}));
         }
 
         core.debug('Task parameters: ' + JSON.stringify(taskParameters));
@@ -87,7 +91,9 @@ export interface ActionParameters {
     createNewDeployment?: boolean;
     deploymentName?: string;
     environmentVariables?: string;
-    Package?: Package;
+    package?: Package;
+    cpu?: string;
+    memory?: string;
     jvmOptions?: string;
     runtimeVersion?: string;
     dotNetCoreMainEntryPath?: string;

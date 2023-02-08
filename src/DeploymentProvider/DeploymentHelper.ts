@@ -185,7 +185,10 @@ export class DeploymentHelper {
         if (params.createNewDeployment) {
             getDeploymentName = await this.getProductionDeploymentName(client, params);
         }
-        let getResponse: asa.DeploymentResource = await this.getDeployment(client, params, getDeploymentName);
+        let getResponse: asa.DeploymentResource;
+        if (getDeploymentName) {
+            getResponse = await this.getDeployment(client, params, getDeploymentName);
+        }
         let deploymentResource: asa.DeploymentResource;
         let sourcePart: {};
         if (sourceType == SourceType.CUSTOM_CONTAINER) {
@@ -231,6 +234,12 @@ export class DeploymentHelper {
             sourcePart["version"] = params.version;
         }
         let deploymentSettingsPart = {};
+        let resourceRequests: asa.ResourceRequests = {};
+        if (params.action == Actions.DEPLOY && params.createNewDeployment) {
+            resourceRequests.cpu = params.cpu;
+            resourceRequests.memory = params.memory;
+            deploymentSettingsPart["resourceRequests"] = resourceRequests;
+        }
         if (params.jvmOptions) {
             sourcePart["jvmOptions"] = params.jvmOptions;
         }
