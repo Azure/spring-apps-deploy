@@ -23,7 +23,12 @@ export class AzureSpringAppsDeploymentProvider {
 
     public async preDeploymentStep() {
         const token = getDefaultAzureCredential();
-        this.client = new asa.AppPlatformManagementClient(token, this.params.azureSubscription);
+        const option: asa.AppPlatformManagementClientOptionalParams = {
+            userAgentOptions : {
+                userAgentPrefix : `GitHub Action `
+            }
+        }
+        this.client = new asa.AppPlatformManagementClient(token, this.params.azureSubscription, option);
         const serviceList = await this.client.services.listBySubscription();
         let filteredResources: Array<asa.ServiceResource> = [];
         for await (const service of serviceList) {
