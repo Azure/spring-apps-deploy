@@ -25,7 +25,7 @@ export class AzureSpringAppsDeploymentProvider {
         const token = getDefaultAzureCredential();
         const option: asa.AppPlatformManagementClientOptionalParams = {
             userAgentOptions : {
-                userAgentPrefix : `GitHub Action `
+                userAgentPrefix : 'GitHub Action / spring-apps-deploy '
             }
         }
         this.client = new asa.AppPlatformManagementClient(token, this.params.azureSubscription, option);
