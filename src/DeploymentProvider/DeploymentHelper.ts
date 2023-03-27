@@ -4,6 +4,7 @@ import { uploadFileToSasUrl } from "./azure-storage";
 import * as core from "@actions/core";
 import { parse } from 'azure-actions-utility/parameterParserUtility';
 import {SourceType} from "./AzureSpringAppsDeploymentProvider";
+import fetch from 'node-fetch';
 
 export class DeploymentHelper {
 
@@ -154,12 +155,29 @@ export class DeploymentHelper {
         let cnt = 0;
         core.debug("wait for build result......");
         //Waiting for build result. Timeout 30 minutes.
+        const logStream = await this.logStreamConstructor(client, params);
+        const stagesRecorded = new Set();
         while (buildProvisioningState != 'Succeeded' && buildProvisioningState != 'Failed' && cnt++ < 180) {
             await new Promise(resolve => setTimeout(resolve, 10000));
-            console.log("wait for 10 seconds....");
-            const waitResponse = await client.buildServiceOperations.getBuildResult(params.resourceGroupName, params.serviceName, buildServiceName, buildName, buildResultName);
-            core.debug('build result response: ' + JSON.stringify(waitResponse));
-            buildProvisioningState = waitResponse.properties.provisioningState;
+            core.debug("wait for 10 seconds....");
+            try {
+                const waitResponse = await client.buildServiceOperations.getBuildResult(params.resourceGroupName, params.serviceName, buildServiceName, buildName, buildResultName);
+                waitResponse.properties.buildStages.forEach(async stage => {
+                    if (!stagesRecorded.has(stage.name) && stage.status != "NotStarted") {
+                        const url=`https://${logStream["baseUrl"]}/api/logstream/buildpods/${waitResponse.properties.buildPodName}/stages/${stage.name}?follow=true`
+                        const credentials = Buffer.from(`primary:${logStream["primaryKey"]}`).toString('base64');
+                        const auth = { "Authorization" : `Basic ${credentials}` };
+                        const response = await fetch(url, {method: 'GET', headers : auth });
+                        response.body.pipe(process.stdout);
+                        stagesRecorded.add(stage.name);
+                    }
+                });
+                core.debug('build result response: ' + JSON.stringify(waitResponse));
+                buildProvisioningState = waitResponse.properties.provisioningState;
+            }
+            catch (e:any) {
+                console.log(e.message);
+            }
         }
         if (cnt == 180) {
             throw Error("Build result timeout.");
@@ -167,6 +185,8 @@ export class DeploymentHelper {
         if (buildProvisioningState != 'Succeeded') {
             throw Error("Build result failed.");
         }
+        const buildLogs = await client.buildServiceOperations.getBuildResultLog(params.resourceGroupName, params.serviceName, buildServiceName, buildName, buildResultName);
+        console.log(`The build result logs url is: ${buildLogs.blobUrl}`);
         let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, buildResponse.properties.triggeredBuildResult.id);
         core.debug("deploymentResource: " + JSON.stringify(deploymentResource));
         const deployResponse = await client.deployments.beginCreateOrUpdateAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
@@ -286,5 +306,15 @@ export class DeploymentHelper {
             };
         }
         return deploymentResource;
+    }
+
+    public static async logStreamConstructor(client: asa.AppPlatformManagementClient, params: ActionParameters) {
+        const test_keys = await client.services.listTestKeys(params.resourceGroupName, params.serviceName);
+        let ret = {};
+        ret["primaryKey"] = test_keys.primaryKey;
+        const testUrl = test_keys.primaryTestEndpoint;
+        const regex = /https:\/\/.*\@/;
+        ret["baseUrl"] = testUrl.replace('.test.', '.').replace(regex, '');
+        return ret;
     }
 }
