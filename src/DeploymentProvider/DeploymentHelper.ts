@@ -185,8 +185,6 @@ export class DeploymentHelper {
         if (buildProvisioningState != 'Succeeded') {
             throw Error("Build result failed.");
         }
-        const buildLogs = await client.buildServiceOperations.getBuildResultLog(params.resourceGroupName, params.serviceName, buildServiceName, buildName, buildResultName);
-        console.log(`The build result logs url is: ${buildLogs.blobUrl}`);
         let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, buildResponse.properties.triggeredBuildResult.id);
         core.debug("deploymentResource: " + JSON.stringify(deploymentResource));
         const deployResponse = await client.deployments.beginCreateOrUpdateAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
