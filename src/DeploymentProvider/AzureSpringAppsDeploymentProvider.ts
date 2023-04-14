@@ -74,6 +74,16 @@ export class AzureSpringAppsDeploymentProvider {
                 break;
             }
 
+            case Actions.BUILD: {
+                await this.performBuildAction();
+                break;
+            }
+
+            case Actions.DELETE_BUILD: {
+                await this.performDeleteBuildAction();
+                break;
+            }
+
             default:
                 throw Error('UnknownOrUnsupportedAction: ' + this.params.action);
         }
@@ -176,6 +186,27 @@ export class AzureSpringAppsDeploymentProvider {
         }
         console.log(`Deploy action successful for ${this.logDetail} to deployment ${deploymentName}.`);
 
+    }
+
+    private async performBuildAction() {
+        if (this.tier != "Enterprise") {
+            throw Error(`Build action is only supported in Enterprise tier.`);
+        }
+        let sourceType: string = this.determineSourceType(this.params.package);
+        //If uploading a source folder, compress to tar.gz file.
+        let fileToUpload: string = sourceType == SourceType.SOURCE_DIRECTORY
+            ? await this.compressSourceDirectory(this.params.package.getPath())
+            : this.params.package.getPath();
+        await dh.build(this.client, this.params, fileToUpload, this.resourceId);
+        console.log(`Build action successful for service ${this.params.serviceName} build ${this.params.buildName}.`);
+    }
+
+    private async performDeleteBuildAction() {
+        if (this.tier != "Enterprise") {
+            throw Error(`Delete build action is only supported in Enterprise tier.`);
+        }
+        await dh.deleteBuild(this.client, this.params);
+        console.log(`Delete build action successful for service ${this.params.serviceName} build ${this.params.buildName}.`);
     }
 
     /**
