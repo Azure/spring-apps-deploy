@@ -15,6 +15,7 @@ export class Inputs {
     public static readonly RUNTIME_VERSION = 'runtime-version';
     public static readonly DOTNETCORE_MAINENTRY_PATH = 'dotnetcore-mainentry-path';
     public static readonly VERSION = 'version';
+    public static readonly BUILD_NAME = 'build-name';
     public static readonly PACKAGE = 'package';
     public static readonly CPU = 'cpu';
     public static readonly MEMORY = 'memory';
@@ -36,6 +37,8 @@ export class Actions {
     public static readonly DEPLOY = 'deploy';
     public static readonly SET_PRODUCTION = 'set-production';
     public static readonly DELETE_STAGING_DEPLOYMENT = 'delete-staging-deployment';
+    public static readonly BUILD = 'build';
+    public static readonly DELETE_BUILD = 'delete-build';
 }
 
 export class ActionParametersUtility {
@@ -45,7 +48,7 @@ export class ActionParametersUtility {
             azureSubscription: core.getInput(Inputs.AZURE_SUBSCRIPTION, {"required": true}),
             serviceName: core.getInput(Inputs.SERVICE_NAME, {"required": true}),
             action: core.getInput(Inputs.ACTION, {"required": true}).toLowerCase(),
-            appName: core.getInput(Inputs.APP_NAME, {"required": true}),
+            appName: core.getInput(Inputs.APP_NAME, {"required": false}),
             useStagingDeployment: core.getInput(Inputs.USE_STAGING_DEPLOYMENT, {"required": true}).toLowerCase() == "true",
             createNewDeployment: core.getInput(Inputs.CREATE_NEW_DEPLOYMENT, {"required": false}).toLowerCase() == "true",
             deploymentName: core.getInput(Inputs.DEPLOYMENT_NAME, {"required": false}),
@@ -56,6 +59,7 @@ export class ActionParametersUtility {
             runtimeVersion: core.getInput(Inputs.RUNTIME_VERSION, {"required": false}),
             dotNetCoreMainEntryPath: core.getInput(Inputs.DOTNETCORE_MAINENTRY_PATH, {"required": false}),
             version: core.getInput(Inputs.VERSION, {"required": false}),
+            buildName: core.getInput(Inputs.BUILD_NAME, {"required": false}),
             builder: core.getInput(Inputs.BUILDER, {"required": false}),
             buildCpu: core.getInput(Inputs.BUILD_CPU, {"required": false}),
             buildMemory: core.getInput(Inputs.BUILD_MEMORY, {"required": false}),
@@ -71,7 +75,7 @@ export class ActionParametersUtility {
         }
 
         //Do not attempt to parse package in non-deployment steps. This causes variable substitution errors.
-        if (taskParameters.action == Actions.DEPLOY) {
+        if (taskParameters.action == Actions.DEPLOY || taskParameters.action == Actions.BUILD) {
             taskParameters.package = new Package(core.getInput(Inputs.PACKAGE, {"required": true}));
         }
 
@@ -98,6 +102,7 @@ export interface ActionParameters {
     runtimeVersion?: string;
     dotNetCoreMainEntryPath?: string;
     version?: string;
+    buildName?: string;
     builder?: string;
     buildCpu?: string;
     buildMemory?: string;
