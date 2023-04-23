@@ -240,7 +240,7 @@ The following example will delete an build resource.
 ```yml
 # environment preparation configurations omitted
     steps:
-      - name: delete build
+      - name: Delete build
         uses: azure/spring-apps-deploy@v1
         with:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
