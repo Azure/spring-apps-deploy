@@ -5,6 +5,7 @@ import * as core from "@actions/core";
 import { parse } from 'azure-actions-utility/parameterParserUtility';
 import {SourceType} from "./AzureSpringAppsDeploymentProvider";
 import fetch from 'node-fetch';
+import * as fs from 'fs';
 
 export class DeploymentHelper {
 
@@ -211,6 +212,9 @@ export class DeploymentHelper {
         if (params.dotNetCoreMainEntryPath) {
             deploymentSettingsPart["netCoreMainEntryPath"] = params.dotNetCoreMainEntryPath;
         }
+        if (params.targetModule) {
+            sourcePart["artifactSelector"] = params.targetModule;
+        }
         if (params.runtimeVersion) {
             sourcePart["runtimeVersion"] = params.runtimeVersion;
         }
@@ -232,7 +236,36 @@ export class DeploymentHelper {
             core.debug('Environment Variables: ' + JSON.stringify(transformedEnvironmentVariables));
             deploymentSettingsPart["environmentVariables"] = transformedEnvironmentVariables;
         }
+        const disableProbe: asa.Probe = {
+            disableProbe: true
+        }
+        if (params.enableLivenessProbe.length > 0) {
+            if (params.enableLivenessProbe.toLowerCase() == "true") {
+                deploymentSettingsPart["livenessProbe"] = this.loadProbeConfig(params.livenessProbeConfig);
+            } else {
+                deploymentSettingsPart["livenessProbe"] = disableProbe;
+            }
+        }
+        if (params.enableReadinessProbe.length > 0) {
+            if (params.enableReadinessProbe.toLowerCase() == "true") {
+                deploymentSettingsPart["readinessProbe"] = this.loadProbeConfig(params.readinessProbeConfig);
+            } else {
+                deploymentSettingsPart["readinessProbe"] = disableProbe;
+            }
+        }
+        if (params.enableStartupProbe.length > 0) {
+            if (params.enableStartupProbe.toLowerCase() == "true") {
+                deploymentSettingsPart["startupProbe"] = this.loadProbeConfig(params.startupProbeConfig);
+            } else {
+                deploymentSettingsPart["startupProbe"] = disableProbe;
+            }
+        }
+        if (params.terminationGracePeriodSeconds) {
+            deploymentSettingsPart["terminationGracePeriodSeconds"] = params.terminationGracePeriodSeconds;
+        }
         if (getResponse) {
+            core.debug("getResponse.properties.deploymentSettings: " + JSON.stringify(getResponse.properties.deploymentSettings));
+            core.debug("deploymentSettingsPart: " + JSON.stringify(deploymentSettingsPart));
             let source = {...getResponse.properties.source, ...sourcePart};
             let deploymentSettings = {...getResponse.properties.deploymentSettings, ...deploymentSettingsPart};
             deploymentResource = {
@@ -331,5 +364,58 @@ export class DeploymentHelper {
         const regex = /https:\/\/.*\@/;
         ret["baseUrl"] = testUrl.replace('.test.', '.').replace(regex, '');
         return ret;
+    }
+
+    private static loadProbeConfig(probeConfig: string): asa.Probe {
+        if (!probeConfig) {
+            return null;
+        }
+        const data = this.readJsonFile(probeConfig);
+        if (!data) {
+            return null;
+        }
+        if (!data.probe) {
+            throw new Error('Probe must be provided in the json file');
+        }
+
+        if (!data.probe.probeAction || !data.probe.probeAction.type) {
+            throw new Error('ProbeAction, Type mast be provided in the json file');
+        }
+
+        let probeAction : asa.ProbeActionUnion = null;
+        if (data.probe.probeAction.type.toLowerCase() === 'httpgetaction') {
+            probeAction = {
+              type: 'HTTPGetAction',
+              path: data.probe.probeAction.path ?? undefined,
+              scheme: data.probe.probeAction.scheme ?? undefined,
+            };
+        } else if (data.probe.probeAction.type.toLowerCase() === 'tcpsocketaction') {
+            probeAction = {
+              type: 'TCPSocketAction',
+            };
+        } else if (data.probe.probeAction.type.toLowerCase() === 'execaction') {
+            probeAction = {
+              type: 'ExecAction',
+              command: data.probe.probeAction.command ?? undefined,
+            };
+        } else {
+            throw new Error('ProbeAction.Type is invalid');
+        }
+
+        const probeSettings : asa.Probe = {
+            probeAction: probeAction,
+            disableProbe: false,
+            initialDelaySeconds: data.probe.initialDelaySeconds ?? undefined,
+            periodSeconds: data.probe.periodSeconds ?? undefined,
+            timeoutSeconds: data.probe.timeoutSeconds ?? undefined,
+            failureThreshold: data.probe.failureThreshold ?? undefined,
+            successThreshold: data.probe.successThreshold ?? undefined
+        };
+        return probeSettings;
+    }
+
+    private static readJsonFile(file: string): any {
+        const data = fs.readFileSync(file);
+        return JSON.parse(data.toString());
     }
 }

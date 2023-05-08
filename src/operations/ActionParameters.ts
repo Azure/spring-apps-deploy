@@ -17,6 +17,7 @@ export class Inputs {
     public static readonly VERSION = 'version';
     public static readonly BUILD_NAME = 'build-name';
     public static readonly PACKAGE = 'package';
+    public static readonly TARGET_MODULE = 'target-module';
     public static readonly CPU = 'cpu';
     public static readonly MEMORY = 'memory';
     public static readonly BUILDER = 'builder';
@@ -31,6 +32,13 @@ export class Inputs {
     public static readonly CONTAINER_COMMAND = 'container-command';
     public static readonly CONTAINER_ARGS = 'container-args';
     public static readonly LANGUAGE_FRAMEWORK = 'language-framework';
+    public static readonly ENABLE_LIVENESS_PROBE = 'enable-liveness-probe';
+    public static readonly ENABLE_READINESS_PROBE = 'enable-readiness-probe';
+    public static readonly ENABLE_STARTUP_PROBE = 'enable-startup-probe';
+    public static readonly TERMINATION_GRACE_PERIOD_SECONDS = 'termination-grace-period-seconds';
+    public static readonly LIVENESS_PROBE_CONFIG = 'liveness-probe-config';
+    public static readonly READINESS_PROBE_CONFIG = 'readiness-probe-config';
+    public static readonly STARTUP_PROBE_CONFIG = 'startup-probe-config';
 }
 
 export class Actions {
@@ -49,9 +57,10 @@ export class ActionParametersUtility {
             serviceName: core.getInput(Inputs.SERVICE_NAME, {"required": true}),
             action: core.getInput(Inputs.ACTION, {"required": true}).toLowerCase(),
             appName: core.getInput(Inputs.APP_NAME, {"required": false}),
-            useStagingDeployment: core.getInput(Inputs.USE_STAGING_DEPLOYMENT, {"required": true}).toLowerCase() == "true",
-            createNewDeployment: core.getInput(Inputs.CREATE_NEW_DEPLOYMENT, {"required": false}).toLowerCase() == "true",
+            useStagingDeployment: core.getBooleanInput(Inputs.USE_STAGING_DEPLOYMENT, {"required": true}),
+            createNewDeployment: core.getBooleanInput(Inputs.CREATE_NEW_DEPLOYMENT, {"required": false}),
             deploymentName: core.getInput(Inputs.DEPLOYMENT_NAME, {"required": false}),
+            targetModule: core.getInput(Inputs.TARGET_MODULE, {"required": false}),
             cpu: core.getInput(Inputs.CPU, {"required": false}),
             memory: core.getInput(Inputs.MEMORY, {"required": false}),
             environmentVariables: core.getInput(Inputs.ENVIRONMENT_VARIABLES, {"required": false}),
@@ -71,7 +80,14 @@ export class ActionParametersUtility {
             containerImage: core.getInput(Inputs.CONTAINER_IMAGE, {"required": false}),
             containerCommand: core.getInput(Inputs.CONTAINER_COMMAND, {"required": false}),
             containerArgs: core.getInput(Inputs.CONTAINER_ARGS, {"required": false}),
-            languageFramework: core.getInput(Inputs.LANGUAGE_FRAMEWORK, {"required": false})
+            languageFramework: core.getInput(Inputs.LANGUAGE_FRAMEWORK, {"required": false}),
+            enableLivenessProbe: core.getInput(Inputs.ENABLE_LIVENESS_PROBE, {"required": false}),
+            enableReadinessProbe: core.getInput(Inputs.ENABLE_READINESS_PROBE, {"required": false}),
+            enableStartupProbe: core.getInput(Inputs.ENABLE_STARTUP_PROBE, {"required": false}),
+            terminationGracePeriodSeconds: Number(core.getInput(Inputs.TERMINATION_GRACE_PERIOD_SECONDS, {"required": false})),
+            livenessProbeConfig: core.getInput(Inputs.LIVENESS_PROBE_CONFIG, {"required": false}),
+            readinessProbeConfig: core.getInput(Inputs.READINESS_PROBE_CONFIG, {"required": false}),
+            startupProbeConfig: core.getInput(Inputs.STARTUP_PROBE_CONFIG, {"required": false})
         }
 
         //Do not attempt to parse package in non-deployment steps. This causes variable substitution errors.
@@ -96,6 +112,7 @@ export interface ActionParameters {
     deploymentName?: string;
     environmentVariables?: string;
     package?: Package;
+    targetModule?: string;
     cpu?: string;
     memory?: string;
     jvmOptions?: string;
@@ -115,4 +132,11 @@ export interface ActionParameters {
     containerCommand?: string;
     containerArgs?: string;
     languageFramework?: string;
+    enableLivenessProbe?: string;
+    enableReadinessProbe?: string;
+    enableStartupProbe?: string;
+    terminationGracePeriodSeconds?: number;
+    livenessProbeConfig?: string;
+    readinessProbeConfig?: string;
+    startupProbeConfig?: string;
 }
