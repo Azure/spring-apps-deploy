@@ -264,8 +264,6 @@ export class DeploymentHelper {
             deploymentSettingsPart["terminationGracePeriodSeconds"] = params.terminationGracePeriodSeconds;
         }
         if (getResponse) {
-            core.debug("getResponse.properties.deploymentSettings: " + JSON.stringify(getResponse.properties.deploymentSettings));
-            core.debug("deploymentSettingsPart: " + JSON.stringify(deploymentSettingsPart));
             let source = {...getResponse.properties.source, ...sourcePart};
             let deploymentSettings = {...getResponse.properties.deploymentSettings, ...deploymentSettingsPart};
             deploymentResource = {
