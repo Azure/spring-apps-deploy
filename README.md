@@ -263,6 +263,7 @@ The following example will delete an build resource.
 |`deployment-name`|deploy<br/>set-production|Optional| The name of the deployment to which the action will apply. It overrides the setting of `use-staging-deployment`.|
 |`create-new-deployment`|deploy|Optional| If set to `true` and the deployment specified by `deployment-name` does not exist at execution time, it will be created.<br/>Default value: `false`|
 |`package`|deploy<br/>build|Required| The file path to the package containing the application to be deployed (`.jar` file for Java, `.zip` for .NET Core) or to a folder containing the application source to be built. <br/>Default value: ```${{ github.workspace }}/**/*.jar```|
+|`target-module`|deploy|Optional| Child module to be deployed, required for multiple jar packages built from source code.|
 |`cpu`|deploy|Optional| The CPU resource quantity. It should be 500m or number of CPU cores. It is effective only when creating new deployment. <br/> Default value: 1|
 |`memory`|deploy|Optional| The memory resource quantity. It should be 512Mi or #Gi, e.g., 1Gi, 3Gi. It is effective only when creating new deployment. <br/> Default value: 1Gi|
 |`runtime-version`|deploy|Optional| The runtime stack for the application.<br/>One of: `Java_8`, `Java_11`, `NetCore_31`,<br/>Default value: `Java_11`|
@@ -283,6 +284,13 @@ The following example will delete an build resource.
 |`container-command`|deploy|Optional| The command of the container.|
 |`container-args`|deploy|Optional| The arguments of the container.|
 |`language-framework`|deploy|Optional| The language framework of the container.|
+|`enable-liveness-probe`|deploy|Optional| If false, will disable the liveness probe of the app instance.  Allowed values: false, true.|
+|`enable-readiness-probe`|deploy|Optional| If false, will disable the readiness probe of the app instance.  Allowed values: false, true.|
+|`enable-startup-probe`|deploy|Optional| If false, will disable the startup probe of the app instance.  Allowed values: false, true.|
+|`termination-grace-period-seconds`|deploy|Optional| Optional duration in seconds the app instance needs to terminate gracefully.|
+|`liveness-probe-config`|deploy|Optional| A json file path indicates the liveness probe config.|
+|`readiness-probe-config`|deploy|Optional| A json file path indicates the readiness probe config.|
+|`startup-probe-config`|deploy|Optional| A json file path indicates the startup probe config.|
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
