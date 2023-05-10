@@ -242,22 +242,28 @@ export class DeploymentHelper {
         if (params.enableLivenessProbe.length > 0) {
             if (params.enableLivenessProbe.toLowerCase() == "true") {
                 deploymentSettingsPart["livenessProbe"] = this.loadProbeConfig(params.livenessProbeConfig);
-            } else {
+            } else if (params.enableLivenessProbe.toLowerCase() == "false") {
                 deploymentSettingsPart["livenessProbe"] = disableProbe;
+            } else {
+                throw new Error("Invalid value for enableLivenessProbe. Please provide true/false");
             }
         }
         if (params.enableReadinessProbe.length > 0) {
             if (params.enableReadinessProbe.toLowerCase() == "true") {
                 deploymentSettingsPart["readinessProbe"] = this.loadProbeConfig(params.readinessProbeConfig);
-            } else {
+            } else if (params.enableReadinessProbe.toLowerCase() == "false") {
                 deploymentSettingsPart["readinessProbe"] = disableProbe;
+            } else {
+                throw new Error("Invalid value for enableReadinessProbe. Please provide true/false");
             }
         }
         if (params.enableStartupProbe.length > 0) {
             if (params.enableStartupProbe.toLowerCase() == "true") {
                 deploymentSettingsPart["startupProbe"] = this.loadProbeConfig(params.startupProbeConfig);
-            } else {
+            } else if (params.enableStartupProbe.toLowerCase() == "false") {
                 deploymentSettingsPart["startupProbe"] = disableProbe;
+            } else {
+                throw new Error("Invalid value for enableStartupProbe. Please provide true/false");
             }
         }
         if (params.terminationGracePeriodSeconds) {
@@ -373,19 +379,19 @@ export class DeploymentHelper {
             return null;
         }
         if (!data.probe) {
-            throw new Error('Probe must be provided in the json file');
+            throw new Error(`Probe must be provided in the json file ${probeConfig}`);
         }
 
         if (!data.probe.probeAction || !data.probe.probeAction.type) {
-            throw new Error('ProbeAction, Type mast be provided in the json file');
+            throw new Error(`ProbeAction, Type mast be provided in the json file ${probeConfig}`);
         }
 
         let probeAction : asa.ProbeActionUnion = null;
         if (data.probe.probeAction.type.toLowerCase() === 'httpgetaction') {
             probeAction = {
               type: 'HTTPGetAction',
-              path: data.probe.probeAction.path ?? undefined,
-              scheme: data.probe.probeAction.scheme ?? undefined,
+              path: data.probe.probeAction.path,
+              scheme: data.probe.probeAction.scheme,
             };
         } else if (data.probe.probeAction.type.toLowerCase() === 'tcpsocketaction') {
             probeAction = {
@@ -394,20 +400,20 @@ export class DeploymentHelper {
         } else if (data.probe.probeAction.type.toLowerCase() === 'execaction') {
             probeAction = {
               type: 'ExecAction',
-              command: data.probe.probeAction.command ?? undefined,
+              command: data.probe.probeAction.command,
             };
         } else {
-            throw new Error('ProbeAction.Type is invalid');
+            throw new Error(`ProbeAction.Type is invalid in the json file ${probeConfig}`);
         }
 
         const probeSettings : asa.Probe = {
             probeAction: probeAction,
             disableProbe: false,
-            initialDelaySeconds: data.probe.initialDelaySeconds ?? undefined,
-            periodSeconds: data.probe.periodSeconds ?? undefined,
-            timeoutSeconds: data.probe.timeoutSeconds ?? undefined,
-            failureThreshold: data.probe.failureThreshold ?? undefined,
-            successThreshold: data.probe.successThreshold ?? undefined
+            initialDelaySeconds: data.probe.initialDelaySeconds,
+            periodSeconds: data.probe.periodSeconds,
+            timeoutSeconds: data.probe.timeoutSeconds,
+            failureThreshold: data.probe.failureThreshold,
+            successThreshold: data.probe.successThreshold
         };
         return probeSettings;
     }
