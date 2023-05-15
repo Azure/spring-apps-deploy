@@ -30,6 +30,9 @@ inputs:
     description: "File path to the package or a folder containing the Spring Apps app contents."
     required: false
     default: '${{ github.workspace }}/**/*.jar'
+  target-module:
+    description: "Child module to be deployed, required for multiple jar packages built from source code."
+    required: false
   cpu:
     description: "The CPU resource quantity. It should be 500m or number of CPU cores. It is effective only when creating new deployment."
     required: false
@@ -92,6 +95,27 @@ inputs:
     required: false
   language-framework:
     description: "The language framework of the container."
+    required: false
+  enable-liveness-probe:
+    description: "If false, will disable the liveness probe of the app instance.  Allowed values: false, true."
+    required: false
+  enable-readiness-probe:
+    description: "If false, will disable the readiness probe of the app instance.  Allowed values: false, true."
+    required: false
+  enable-startup-probe:
+    description: "If false, will disable the startup probe of the app instance.  Allowed values: false, true."
+    required: false
+  termination-grace-period-seconds:
+    description: "Optional duration in seconds the app instance needs to terminate gracefully."
+    required: false
+  liveness-probe-config: 
+    description: "A json file path indicates the liveness probe config"
+    required: false
+  readiness-probe-config: 
+    description: "A json file path indicates the readiness probe config"
+    required: false
+  startup-probe-config: 
+    description: "A json file path indicates the startup probe config"
     required: false
 
 
