@@ -5,6 +5,7 @@ import * as core from "@actions/core";
 import { parse } from 'azure-actions-utility/parameterParserUtility';
 import {SourceType} from "./AzureSpringAppsDeploymentProvider";
 import fetch from 'node-fetch';
+import * as fs from 'fs';
 
 export class DeploymentHelper {
 
@@ -211,6 +212,9 @@ export class DeploymentHelper {
         if (params.dotNetCoreMainEntryPath) {
             deploymentSettingsPart["netCoreMainEntryPath"] = params.dotNetCoreMainEntryPath;
         }
+        if (params.targetModule) {
+            sourcePart["artifactSelector"] = params.targetModule;
+        }
         if (params.runtimeVersion) {
             sourcePart["runtimeVersion"] = params.runtimeVersion;
         }
@@ -231,6 +235,39 @@ export class DeploymentHelper {
             });
             core.debug('Environment Variables: ' + JSON.stringify(transformedEnvironmentVariables));
             deploymentSettingsPart["environmentVariables"] = transformedEnvironmentVariables;
+        }
+        const disableProbe: asa.Probe = {
+            disableProbe: true
+        }
+        if (params.enableLivenessProbe.length > 0) {
+            if (params.enableLivenessProbe.toLowerCase() == "true") {
+                deploymentSettingsPart["livenessProbe"] = this.loadProbeConfig(params.livenessProbeConfig);
+            } else if (params.enableLivenessProbe.toLowerCase() == "false") {
+                deploymentSettingsPart["livenessProbe"] = disableProbe;
+            } else {
+                throw new Error("Invalid value for enableLivenessProbe. Please provide true/false");
+            }
+        }
+        if (params.enableReadinessProbe.length > 0) {
+            if (params.enableReadinessProbe.toLowerCase() == "true") {
+                deploymentSettingsPart["readinessProbe"] = this.loadProbeConfig(params.readinessProbeConfig);
+            } else if (params.enableReadinessProbe.toLowerCase() == "false") {
+                deploymentSettingsPart["readinessProbe"] = disableProbe;
+            } else {
+                throw new Error("Invalid value for enableReadinessProbe. Please provide true/false");
+            }
+        }
+        if (params.enableStartupProbe.length > 0) {
+            if (params.enableStartupProbe.toLowerCase() == "true") {
+                deploymentSettingsPart["startupProbe"] = this.loadProbeConfig(params.startupProbeConfig);
+            } else if (params.enableStartupProbe.toLowerCase() == "false") {
+                deploymentSettingsPart["startupProbe"] = disableProbe;
+            } else {
+                throw new Error("Invalid value for enableStartupProbe. Please provide true/false");
+            }
+        }
+        if (params.terminationGracePeriodSeconds) {
+            deploymentSettingsPart["terminationGracePeriodSeconds"] = params.terminationGracePeriodSeconds;
         }
         if (getResponse) {
             let source = {...getResponse.properties.source, ...sourcePart};
@@ -331,5 +368,58 @@ export class DeploymentHelper {
         const regex = /https:\/\/.*\@/;
         ret["baseUrl"] = testUrl.replace('.test.', '.').replace(regex, '');
         return ret;
+    }
+
+    private static loadProbeConfig(probeConfig: string): asa.Probe {
+        if (!probeConfig) {
+            return null;
+        }
+        const data = this.readJsonFile(probeConfig);
+        if (!data) {
+            return null;
+        }
+        if (!data.probe) {
+            throw new Error(`Probe must be provided in the json file ${probeConfig}`);
+        }
+
+        if (!data.probe.probeAction || !data.probe.probeAction.type) {
+            throw new Error(`ProbeAction, Type mast be provided in the json file ${probeConfig}`);
+        }
+
+        let probeAction : asa.ProbeActionUnion = null;
+        if (data.probe.probeAction.type.toLowerCase() === 'httpgetaction') {
+            probeAction = {
+              type: 'HTTPGetAction',
+              path: data.probe.probeAction.path,
+              scheme: data.probe.probeAction.scheme,
+            };
+        } else if (data.probe.probeAction.type.toLowerCase() === 'tcpsocketaction') {
+            probeAction = {
+              type: 'TCPSocketAction',
+            };
+        } else if (data.probe.probeAction.type.toLowerCase() === 'execaction') {
+            probeAction = {
+              type: 'ExecAction',
+              command: data.probe.probeAction.command,
+            };
+        } else {
+            throw new Error(`ProbeAction.Type is invalid in the json file ${probeConfig}`);
+        }
+
+        const probeSettings : asa.Probe = {
+            probeAction: probeAction,
+            disableProbe: false,
+            initialDelaySeconds: data.probe.initialDelaySeconds,
+            periodSeconds: data.probe.periodSeconds,
+            timeoutSeconds: data.probe.timeoutSeconds,
+            failureThreshold: data.probe.failureThreshold,
+            successThreshold: data.probe.successThreshold
+        };
+        return probeSettings;
+    }
+
+    private static readJsonFile(file: string): any {
+        const data = fs.readFileSync(file);
+        return JSON.parse(data.toString());
     }
 }
