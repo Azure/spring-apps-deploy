@@ -134,8 +134,7 @@ export class AzureSpringAppsDeploymentProvider {
         let sourceType: string = this.determineSourceType(this.params.package);
         //If uploading a source folder, compress to tar.gz file.
         let fileToUpload: string 
-        if (sourceType != SourceType.CUSTOM_CONTAINER)
-        {
+        if (sourceType != SourceType.CUSTOM_CONTAINER) {
             fileToUpload = sourceType == SourceType.SOURCE_DIRECTORY
             ? await this.compressSourceDirectory(this.params.package.getPath())
             : this.params.package.getPath();
