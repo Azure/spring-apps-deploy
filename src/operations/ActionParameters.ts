@@ -91,7 +91,7 @@ export class ActionParametersUtility {
         }
 
         //Do not attempt to parse package in non-deployment steps. This causes variable substitution errors.
-        if (taskParameters.action == Actions.DEPLOY || taskParameters.action == Actions.BUILD) {
+        if ((taskParameters.action == Actions.DEPLOY && !taskParameters.containerImage) || taskParameters.action == Actions.BUILD) {
             taskParameters.package = new Package(core.getInput(Inputs.PACKAGE, {"required": true}));
         }
 

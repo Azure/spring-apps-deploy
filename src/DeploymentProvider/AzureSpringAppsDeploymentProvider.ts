@@ -133,9 +133,12 @@ export class AzureSpringAppsDeploymentProvider {
     private async performDeployAction() {
         let sourceType: string = this.determineSourceType(this.params.package);
         //If uploading a source folder, compress to tar.gz file.
-        let fileToUpload: string = sourceType == SourceType.SOURCE_DIRECTORY
-            ? await this.compressSourceDirectory(this.params.package.getPath())
-            : this.params.package.getPath();
+        let fileToUpload: string 
+        if (sourceType != SourceType.CUSTOM_CONTAINER) {
+            fileToUpload = sourceType == SourceType.SOURCE_DIRECTORY
+                ? await this.compressSourceDirectory(this.params.package.getPath())
+                : this.params.package.getPath();
+        }
         let deploymentName: string;
 
         if (this.params.deploymentName) {
