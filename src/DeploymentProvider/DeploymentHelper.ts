@@ -364,7 +364,7 @@ export class DeploymentHelper {
         const serviceResponse = await client.services.get(params.resourceGroupName, params.serviceName);
         ret["baseUrl"] = serviceResponse.properties.fqdn;
         return ret;
-    } 
+    }
 
     private static loadProbeConfig(probeConfig: string): asa.Probe {
         if (!probeConfig) {
