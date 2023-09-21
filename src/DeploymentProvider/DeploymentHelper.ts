@@ -106,16 +106,14 @@ export class DeploymentHelper {
         await uploadFileToSasUrl(uploadResponse.uploadUrl, fileToUpload);
         let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, uploadResponse.relativePath);
         core.debug("deploymentResource: " + JSON.stringify(deploymentResource));
-        const response = await client.deployments.beginCreateOrUpdateAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
-        core.debug('deploy response: ' + JSON.stringify(response));
+        await this.deployWithLog(client, params, deploymentResource);
         return;
     }
 
     public static async deployCustomContainer(client: asa.AppPlatformManagementClient, params: ActionParameters, sourceType: string) {
         let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, null);
         core.debug("custom container deploymentResource: " + JSON.stringify(deploymentResource));
-        const response = await client.deployments.beginCreateOrUpdateAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
-        core.debug('custom container deploy response: ' + JSON.stringify(response));
+        await this.deployWithLog(client, params, deploymentResource);
         return;
     }
 
@@ -123,9 +121,8 @@ export class DeploymentHelper {
         const buildResponse = await this.buildAndGetResult(client, params, fileToUpload, resourceId);
         let deploymentResource: asa.DeploymentResource = await this.buildDeploymentResource(client, params, sourceType, buildResponse.properties.triggeredBuildResult.id);
         core.debug("deploymentResource: " + JSON.stringify(deploymentResource));
-        const deployResponse = await client.deployments.beginCreateOrUpdateAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
-        core.debug('deploy response: ' + JSON.stringify(deployResponse));
-
+        await this.deployWithLog(client, params, deploymentResource);
+        return;
     }
 
     public static async deleteDeployment(client: asa.AppPlatformManagementClient, params: ActionParameters) {
@@ -364,11 +361,10 @@ export class DeploymentHelper {
         const test_keys = await client.services.listTestKeys(params.resourceGroupName, params.serviceName);
         let ret = {};
         ret["primaryKey"] = test_keys.primaryKey;
-        const testUrl = test_keys.primaryTestEndpoint;
-        const regex = /https:\/\/.*\@/;
-        ret["baseUrl"] = testUrl.replace('.test.', '.').replace(regex, '');
+        const serviceResponse = await client.services.get(params.resourceGroupName, params.serviceName);
+        ret["baseUrl"] = serviceResponse.properties.fqdn;
         return ret;
-    }
+    } 
 
     private static loadProbeConfig(probeConfig: string): asa.Probe {
         if (!probeConfig) {
@@ -421,5 +417,56 @@ export class DeploymentHelper {
     private static readJsonFile(file: string): any {
         const data = fs.readFileSync(file);
         return JSON.parse(data.toString());
+    }
+
+    private static async printLatestAppInstanceLog(client: asa.AppPlatformManagementClient, params: ActionParameters) {
+        const logStream = await this.logStreamConstructor(client, params);
+        const deploymentResource = await client.deployments.get(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName);
+        const instances = deploymentResource.properties.instances;
+        let startTime = instances[0].startTime;
+        let instanceName = instances[0].name;
+
+        // print the newly created instance log
+        for (const tempInstance of instances) {
+            if (tempInstance.startTime > startTime) {
+                startTime = tempInstance.startTime;
+                instanceName = tempInstance.name;
+            }
+        }
+        let streamingUrl = `https://${logStream["baseUrl"]}/api/logstream/apps/${params.appName}/instances/${instanceName}`;
+        const logParams: any = {};
+        logParams['tailLines'] = 500;
+        logParams['limitBytes'] = 1024 * 1024;
+        logParams['sinceSeconds'] = 300;
+        logParams['follow'] = true;
+        const credentials = Buffer.from(`primary:${logStream["primaryKey"]}`).toString('base64');
+        const auth = { "Authorization" : `Basic ${credentials}` };
+        var url = new URL(streamingUrl)
+        url.search = new URLSearchParams(logParams).toString();
+        fetch(url, {method: 'GET', headers : auth })
+            .then(response => {
+            if (response.ok) {
+              const stream = response.body;
+              // Pipe the stream to stderr
+              stream.pipe(process.stderr);
+            } else {
+              // Handle error response
+              console.error('Error:', response.status, response.statusText);
+            }
+          })
+          .catch(error => {
+            // Handle network error
+            console.error('Error:', error.message);
+          });;
+    }
+
+    private static async deployWithLog(client: asa.AppPlatformManagementClient, params: ActionParameters, deploymentResource: asa.DeploymentResource) {
+        try {
+            const response = await client.deployments.beginCreateOrUpdateAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
+            core.debug('deploy response: ' + JSON.stringify(response));
+        } catch (e:any) {
+            await this.printLatestAppInstanceLog(client, params);
+            throw Error(e);
+        }
     }
 }
