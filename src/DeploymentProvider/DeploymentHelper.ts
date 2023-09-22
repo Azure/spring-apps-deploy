@@ -364,7 +364,7 @@ export class DeploymentHelper {
         const serviceResponse = await client.services.get(params.resourceGroupName, params.serviceName);
         ret["baseUrl"] = serviceResponse.properties.fqdn;
         return ret;
-    }
+    } 
 
     private static loadProbeConfig(probeConfig: string): asa.Probe {
         if (!probeConfig) {
@@ -445,19 +445,19 @@ export class DeploymentHelper {
         url.search = new URLSearchParams(logParams).toString();
         fetch(url, {method: 'GET', headers : auth })
             .then(response => {
-            if (response.ok) {
-              const stream = response.body;
-              // Pipe the stream to stderr
-              stream.pipe(process.stderr);
-            } else {
-              // Handle error response
-              console.error('Error:', response.status, response.statusText);
-            }
-          })
-          .catch(error => {
-            // Handle network error
-            console.error('Error:', error.message);
-          });;
+                if (response.ok) {
+                    const stream = response.body;
+                    // Pipe the stream to stderr
+                    stream.pipe(process.stderr);
+                } else {
+                    // Handle error response
+                    console.error('Error:', response.status, response.statusText);
+                }
+            })
+            .catch(error => {
+                // Handle network error
+                console.error('Error:', error.message);
+            });;
     }
 
     private static async deployWithLog(client: asa.AppPlatformManagementClient, params: ActionParameters, deploymentResource: asa.DeploymentResource) {
@@ -465,8 +465,9 @@ export class DeploymentHelper {
             const response = await client.deployments.beginCreateOrUpdateAndWait(params.resourceGroupName, params.serviceName, params.appName, params.deploymentName, deploymentResource);
             core.debug('deploy response: ' + JSON.stringify(response));
         } catch (e:any) {
+            core.warning("Deployment failed. Please check the application logs for more details.");
             await this.printLatestAppInstanceLog(client, params);
-            throw Error(e);
+            throw e;
         }
     }
 }
