@@ -180,7 +180,7 @@ export class AzureSpringAppsDeploymentProvider {
         if (sourceType == SourceType.CUSTOM_CONTAINER) {
             await dh.deployCustomContainer(this.client, this.params, sourceType);
         }
-        else if (this.tier == "Standard" || this.tier == "Basic") {
+        else if (this.tier == "Standard" || this.tier == "StandardGen2" ||  this.tier == "Basic") {
             await dh.deploy(this.client, this.params, sourceType, fileToUpload);
         } else if (this.tier == "Enterprise") {
             await dh.deployEnterprise(this.client, this.params, "BuildResult", fileToUpload, this.resourceId);
