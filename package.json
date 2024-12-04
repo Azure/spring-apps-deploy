@@ -31,7 +31,7 @@
     "@actions/github": "^5.0.0",
     "@azure/arm-appplatform": "^3.0.0-beta.1",
     "@azure/identity": "^2.1.0",
-    "@azure/storage-file-share": "^12.8.0",
+    "@azure/storage-file-share": "^12.14.0",
     "azure-actions-utility": "^1.0.3",
     "node-fetch": "^2.6.7",
     "tar": "^6.1.11",
